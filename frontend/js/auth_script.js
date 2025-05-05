@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Форма входа
     loginFormElement.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Предотвращаем стандартную отправку
+        e.preventDefault();
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;
         clearFormErrors();
@@ -264,24 +264,18 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading(loginFormElement.querySelector('button[type="submit"]'));
 
         try {
-            // !!! ЗАМЕНИТЬ НА FETCH К ВАШЕМУ API (/api/auth/login) !!!
-            console.log(`Запрос на вход: ${email}`);
-            // Пример fetch:
-            // const response = await fetch('/api/auth/login', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email, password })
-            // });
-            // const data = await response.json(); // Ожидаем { success: true, token: '...', user: {...} } или { success: false, message: '...' }
-            // if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
+            // Реальный запрос на сервер
+            const response = await fetch('http://localhost:3000/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
 
             // --- Если успешно ---
-            console.log('Вход выполнен (симуляция)');
-            // Сохранить токен (например, в localStorage)
-            // localStorage.setItem('authToken', data.token);
-            // Перенаправить пользователя
-             alert('Вход выполнен успешно! (Перенаправление...)');
-             // window.location.href = '/dashboard.html'; // Или куда нужно перенаправить
+            alert('Вход выполнен успешно! (Перенаправление...)');
+            // window.location.href = '/dashboard.html';
             // --- Конец успешного блока ---
 
         } catch (error) {
@@ -290,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginEmailInput.classList.add('input-error');
             loginPasswordInput.classList.add('input-error');
         } finally {
-             hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
+            hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
         }
     });
 
@@ -339,34 +333,29 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading(registerFormElement.querySelector('button[type="submit"]'));
 
         try {
-             // !!! ЗАМЕНИТЬ НА FETCH К ВАШЕМУ API (/api/auth/register) !!!
-             console.log(`Запрос на регистрацию: ${email}`);
-             // Пример fetch:
-            // const response = await fetch('/api/auth/register', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ firstName, lastName, email, password })
-            // });
-            // const data = await response.json(); // Ожидаем { success: true } или { success: false, message: '...' }
-            // if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
+            // Реальный запрос на сервер
+            const response = await fetch('http://localhost:3000/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, password })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
 
             // --- Если успешно ---
-            console.log('Регистрация успешна (симуляция)');
             alert('Регистрация прошла успешно! Теперь вы можете войти.');
-            switchToLoginBtn.click(); // Переключиться на форму входа
-            // Очистить поля формы регистрации
+            switchToLoginBtn.click();
             registerFormElement.reset();
             // --- Конец успешного блока ---
 
         } catch (error) {
             console.error("Ошибка регистрации:", error);
-            // Показать ошибку (например, если email уже занят)
-             showError(registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement), error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.');
-             if (error.message && error.message.toLowerCase().includes('email')) {
-                 registerEmailInput.classList.add('input-error');
-             }
+            showError(registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement), error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.');
+            if (error.message && error.message.toLowerCase().includes('email')) {
+                registerEmailInput.classList.add('input-error');
+            }
         } finally {
-             hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
+            hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
         }
     });
 
@@ -469,4 +458,3 @@ document.addEventListener('DOMContentLoaded', () => {
      }
 
 }); // Конец DOMContentLoaded
-  
