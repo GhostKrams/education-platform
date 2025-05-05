@@ -9,7 +9,8 @@ app.use(express.json());
 // Обслуживание статических файлов из frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Маршруты API (добавим позже)
-// app.use('/auth', require('./routes/auth'));
+// Маршруты API 
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes);
 
 app.listen(3000, () => console.log('Server running on port 3000'));

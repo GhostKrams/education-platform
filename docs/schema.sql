@@ -1,3 +1,4 @@
+
 -- Создаём пользовательский тип для роли
 CREATE TYPE role_type AS ENUM ('Student', 'Teacher', 'Admin', 'Moderator', 'Parent');
 
