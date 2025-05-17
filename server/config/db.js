@@ -4,7 +4,7 @@ const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'education_platform',
-  password: '123125', // Укажи пароль, который ты задала при установке PostgreSQL
+  password: 'sima2014', // Укажи пароль, который ты задала при установке PostgreSQL
   port: 5432,
 });
 

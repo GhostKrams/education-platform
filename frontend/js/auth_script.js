@@ -255,38 +255,41 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;
         clearFormErrors();
-
+      
         if (!email || !password) {
-            alert('Пожалуйста, заполните все поля');
-            return;
+          alert('Пожалуйста, заполните все поля');
+          return;
         }
-
+      
         showLoading(loginFormElement.querySelector('button[type="submit"]'));
-
+      
         try {
-            // Реальный запрос на сервер
-            const response = await fetch('http://localhost:3000/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await response.json();
-            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
-
-            // --- Если успешно ---
-            alert('Вход выполнен успешно! (Перенаправление...)');
-            // window.location.href = '/dashboard.html';
-            // --- Конец успешного блока ---
-
+          const response = await fetch('http://localhost:3000/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
+      
+          // Сохраняем токен и данные пользователя
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+      
+          alert('Вход выполнен успешно! (Перенаправление...)');
+          window.location.href = 'my-courses.html';
         } catch (error) {
-            console.error("Ошибка входа:", error);
-            showError(loginFormElement.querySelector('.error-message') || createErrorElement(loginFormElement), error.message || 'Неверный email или пароль.');
-            loginEmailInput.classList.add('input-error');
-            loginPasswordInput.classList.add('input-error');
+          console.error('Ошибка входа:', error);
+          showError(
+            loginFormElement.querySelector('.error-message') || createErrorElement(loginFormElement),
+            error.message || 'Неверный email или пароль.'
+          );
+          loginEmailInput.classList.add('input-error');
+          loginPasswordInput.classList.add('input-error');
         } finally {
-            hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
+          hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
         }
-    });
+      });
 
     // Форма регистрации
     registerFormElement.addEventListener('submit', async (e) => {
@@ -297,67 +300,62 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = registerPasswordInput.value;
         const confirmPassword = confirmPasswordInput.value;
         clearFormErrors();
-
+      
         let hasError = false;
-        if (!firstName) {
-            registerFirstNameInput.classList.add('input-error'); hasError = true; }
-        if (!lastName) {
-             registerLastNameInput.classList.add('input-error'); hasError = true; }
-        if (!validateEmail(email)) {
-             registerEmailInput.classList.add('input-error'); hasError = true; /* Добавить сообщение об ошибке email */ }
-        if (!password) {
-             registerPasswordInput.classList.add('input-error'); hasError = true; }
-        if (!confirmPassword) {
-             confirmPasswordInput.classList.add('input-error'); hasError = true; }
-
+        if (!firstName) { registerFirstNameInput.classList.add('input-error'); hasError = true; }
+        if (!lastName) { registerLastNameInput.classList.add('input-error'); hasError = true; }
+        if (!validateEmail(email)) { registerEmailInput.classList.add('input-error'); hasError = true; }
+        if (!password) { registerPasswordInput.classList.add('input-error'); hasError = true; }
+        if (!confirmPassword) { registerPasswordInput.classList.add('input-error'); hasError = true; }
+      
         if (hasError) {
-             alert('Пожалуйста, заполните все обязательные поля корректно.');
-             return;
+          alert('Пожалуйста, заполните все обязательные поля корректно.');
+          return;
         }
-
-
         if (password !== confirmPassword) {
-            showError(passwordMatchError, 'Пароли не совпадают');
-            registerPasswordInput.classList.add('input-error');
-            confirmPasswordInput.classList.add('input-error');
-            return;
+          showError(passwordMatchError, 'Пароли не совпадают');
+          registerPasswordInput.classList.add('input-error');
+          confirmPasswordInput.classList.add('input-error');
+          return;
         }
-         // Доп. проверка сложности пароля (пример)
         if (password.length < 6) {
-             showError(passwordMatchError, 'Пароль должен быть не менее 6 символов');
-             registerPasswordInput.classList.add('input-error');
-             confirmPasswordInput.classList.add('input-error');
-             return;
+          showError(passwordMatchError, 'Пароль должен быть не менее 6 символов');
+          registerPasswordInput.classList.add('input-error');
+          confirmPasswordInput.classList.add('input-error');
+          return;
         }
-
+      
         showLoading(registerFormElement.querySelector('button[type="submit"]'));
-
+      
         try {
-            // Реальный запрос на сервер
-            const response = await fetch('http://localhost:3000/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ firstName, lastName, email, password })
-            });
-            const data = await response.json();
-            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
-
-            // --- Если успешно ---
-            alert('Регистрация прошла успешно! Теперь вы можете войти.');
-            switchToLoginBtn.click();
-            registerFormElement.reset();
-            // --- Конец успешного блока ---
-
+          const response = await fetch('http://localhost:3000/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName, lastName, email, password })
+          });
+          const data = await response.json();
+          if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
+      
+          // Сохраняем токен и данные пользователя
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+      
+          alert('Регистрация прошла успешно! Теперь вы можете войти.');
+          switchToLoginBtn.click();
+          registerFormElement.reset();
         } catch (error) {
-            console.error("Ошибка регистрации:", error);
-            showError(registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement), error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.');
-            if (error.message && error.message.toLowerCase().includes('email')) {
-                registerEmailInput.classList.add('input-error');
-            }
+          console.error('Ошибка регистрации:', error);
+          showError(
+            registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement),
+            error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.'
+          );
+          if (error.message && error.message.toLowerCase().includes('email')) {
+            registerEmailInput.classList.add('input-error');
+          }
         } finally {
-            hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
+          hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
         }
-    });
+      });
 
     // --- Вспомогательные функции ---
 

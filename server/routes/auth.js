@@ -3,37 +3,32 @@ const router = express.Router();
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken'); // Добавляем библиотеку JWT
 
-// Временное хранилище кодов (для демо, в продакшене используй Redis)
+const JWT_SECRET = 'your_jwt_secret_key'; // Храните в .env в продакшене
+
 const resetCodes = {};
 
-// Настройка транспортера для отправки email (пример для Gmail)
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: 'krams.anna@gmail.com', // email
-    pass: '...', //пароль приложения(почта реальная, надо будет протестить, пароль дам) 
+    user: 'krams.anna@gmail.com',
+    pass: process.env.EMAIL_PASS || 'your_email_password', // Используйте .env
   },
 });
 
 // Отправка кода на email
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
-
   try {
-    // Исправлено: имена таблиц и столбцов в нижнем регистре
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (user.rows.length === 0) {
       return res.status(404).json({ message: 'Пользователь с таким email не найден' });
     }
 
-    // Генерируем 6-значный код
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Сохраняем код во временное хранилище (с TTL 10 минут)
     resetCodes[email] = { code, expires: Date.now() + 10 * 60 * 1000 };
 
-    // Отправляем email с кодом
     const mailOptions = {
       from: 'krams.anna98@gmail.com',
       to: email,
@@ -52,30 +47,24 @@ router.post('/forgot-password', async (req, res) => {
 // Проверка кода
 router.post('/verify-code', async (req, res) => {
   const { email, code } = req.body;
-
   const storedCode = resetCodes[email];
   if (!storedCode) {
     return res.status(400).json({ message: 'Код не найден или истёк' });
   }
-
   if (storedCode.expires < Date.now()) {
     delete resetCodes[email];
     return res.status(400).json({ message: 'Код истёк' });
   }
-
   if (storedCode.code !== code) {
     return res.status(400).json({ message: 'Неверный код' });
   }
-
   res.json({ message: 'Код подтверждён' });
 });
 
 // Смена пароля
 router.post('/reset-password', async (req, res) => {
   const { email, newPassword } = req.body;
-
   try {
-    // Исправлено: имена таблиц и столбцов в нижнем регистре
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (user.rows.length === 0) {
       return res.status(404).json({ message: 'Пользователь с таким email не найден' });
@@ -84,9 +73,7 @@ router.post('/reset-password', async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await pool.query('UPDATE users SET passwordhash = $1 WHERE email = $2', [hashedPassword, email]);
 
-    // Удаляем код после успешной смены пароля
     delete resetCodes[email];
-
     res.json({ message: 'Пароль успешно изменён' });
   } catch (error) {
     console.error(error);
@@ -96,15 +83,13 @@ router.post('/reset-password', async (req, res) => {
 
 // Регистрация пользователя
 router.post('/register', async (req, res) => {
-  console.log('POST /auth/register вызван'); // Логируем сам факт запроса
+  console.log('POST /auth/register вызван');
   const { firstName, lastName, email, password } = req.body;
-  console.log('POST /register body:', req.body); // Логируем тело запроса
-
+  console.log('POST /register body:', req.body);
   if (!firstName || !lastName || !email || !password) {
     return res.status(400).json({ success: false, message: 'Заполните все поля' });
   }
   try {
-    // Используем имена таблиц и столбцов в нижнем регистре!
     const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userExists.rows.length > 0) {
       return res.status(409).json({ success: false, message: 'Email уже зарегистрирован' });
@@ -112,9 +97,8 @@ router.post('/register', async (req, res) => {
     const fullName = `${firstName} ${lastName}`;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Вставка пользователя
     const insertResult = await pool.query(
-      'INSERT INTO users (fullname, email, passwordhash, role) VALUES ($1, $2, $3, $4) RETURNING userid',
+      'INSERT INTO users (fullname, email, passwordhash, role) VALUES ($1, $2, $3, $4) RETURNING userid, fullname, email, role',
       [fullName, email, hashedPassword, 'Student']
     );
     console.log('INSERT RESULT:', insertResult.rows);
@@ -122,7 +106,26 @@ router.post('/register', async (req, res) => {
     if (insertResult.rows.length === 0) {
       return res.status(500).json({ success: false, message: 'Ошибка при добавлении пользователя' });
     }
-    res.json({ success: true, message: 'Регистрация успешна', userId: insertResult.rows[0].userid });
+
+    const user = insertResult.rows[0];
+    const token = jwt.sign(
+      { userId: user.userid, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      success: true,
+      message: 'Регистрация успешна',
+      token,
+      user: {
+        userId: user.userid,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+        avatarUrl: null
+      }
+    });
   } catch (error) {
     console.error('Ошибка регистрации:', error);
     res.status(500).json({ success: false, message: 'Ошибка сервера при регистрации', error: error.message });
@@ -142,11 +145,50 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Неверный email или пароль' });
     }
-    // Можно добавить генерацию JWT, если нужно
-    res.json({ success: true, message: 'Вход выполнен', userId: user.userid });
+
+    const token = jwt.sign(
+      { userId: user.userid, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      success: true,
+      message: 'Вход выполнен',
+      token,
+      user: {
+        userId: user.userid,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+        avatarUrl: null
+      }
+    });
   } catch (error) {
     console.error('Ошибка входа:', error);
     res.status(500).json({ success: false, message: 'Ошибка сервера при входе' });
+  }
+});
+
+router.get('/users/me', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Токен не предоставлен' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userResult = await pool.query(
+      'SELECT userid, fullname, email, role FROM users WHERE userid = $1',
+      [decoded.userId]
+    );
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+    res.json({ user: userResult.rows[0] });
+  } catch (error) {
+    console.error('Ошибка получения данных пользователя:', error);
+    res.status(401).json({ message: 'Неверный или истёкший токен' });
   }
 });
 

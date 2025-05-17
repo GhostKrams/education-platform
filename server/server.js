@@ -11,6 +11,8 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Маршруты API 
 const authRoutes = require('./routes/auth');
+const courseRoutes = require('./routes/courses');
 app.use('/auth', authRoutes);
+app.use('/courses', courseRoutes);
 
 app.listen(3000, () => console.log('Server running on port 3000'));
