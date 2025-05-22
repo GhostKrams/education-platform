@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок | Образовательная платформа</title>
+    <!-- Подключаем Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключаем Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Подключаем общий CSS-файл проекта -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Настройка Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Mobile menu button -->
+        <div class="md:hidden fixed top-4 left-4 z-50">
+            <button id="menuToggle" class="text-primary-500 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Overlay for mobile menu -->
+        <div id="overlay" class="overlay"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg">
+            <div class="p-4 border-b border-gray-200">
+                <a href="index.html" class="text-2xl font-bold text-primary-500">EduPlatform</a>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="my-courses.html" class="flex items-center p-3 rounded-lg bg-primary-100 text-primary-600">
+                            <i class="fas fa-book mr-3 text-primary-500"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="answers-feed.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-stream mr-3 text-primary-400"></i>
+                            <span>Лента ответов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="testing.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-clipboard-check mr-3 text-primary-400"></i>
+                            <span>Тестирование</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="schedule.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-calendar-alt mr-3 text-primary-400"></i>
+                            <span>Расписание</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-user mr-3 text-primary-400"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-200 mt-auto">
+                <div class="flex items-center">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" id="sidebarUserAvatar" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <p class="font-medium" id="sidebarUserName">Анна</p>
+                        <p class="text-sm text-gray-500" id="sidebarUserRole">Студент</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Notification popup -->
+            <div id="notificationPopup" class="bg-primary-100 text-primary-800 p-3 shadow-md flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-bell mr-2"></i>
+                    <span>У вас новое уведомление: Домашнее задание проверено</span>
+                </div>
+                <button onclick="closeNotification()" class="text-primary-500 hover:text-primary-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <a href="course-detail.html" class="text-primary-500 hover:text-primary-700 mr-2">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-xl md:text-2xl font-bold text-gray-800">Годовой курс 2024–2025 — ОГЭ</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notificationsBtn" class="text-gray-600 hover:text-primary-500 focus:outline-none relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="notification-badge">2</span>
+                            </button>
+                        </div>
+                        <div class="hidden md:block">
+                            <button id="userMenuBtn" class="flex items-center text-gray-600 hover:text-primary-500 focus:outline-none">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                                <span class="font-medium">Анна</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-4 md:p-6">
+                <!-- Admin edit button (visible only for admins) -->
+                <div id="adminControls" class="flex justify-end mb-4">
+                    <button id="editLessonBtn" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition flex items-center">
+                        <i class="fas fa-edit mr-2"></i> Редактировать урок
+                    </button>
+                </div>
+
+                <!-- Lesson title -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Урок 5: Алгебраические выражения</h2>
+                    <p class="text-gray-600">Длительность: 45 минут</p>
+                </div>
+
+                <!-- Video player -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                    <div class="aspect-w-16 aspect-h-9">
+                        <iframe 
+                            src="https://rutube.ru/play/embed/123456789" 
+                            class="w-full h-64 md:h-96"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <!-- Lesson materials -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Материалы к уроку</h3>
+                        <span class="text-sm text-gray-500">5 файлов</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Material 1 - PDF -->
+                        <div class="file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative">
+                            <div class="flex items-start">
+                                <div class="bg-red-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Конспект урока</h4>
+                                    <p class="text-sm text-gray-500">PDF • 2.4 MB</p>
+                                </div>
+                            </div>
+                            <div class="file-actions absolute top-2 right-2">
+                                <a href="/download/material/1" class="text-primary-500 hover:text-primary-700 p-1">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Material 2 - Image (visible immediately) -->
+                        <div class="file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-image text-blue-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Домашнее задание</h4>
+                                    <p class="text-sm text-gray-500">JPG • 1.2 MB</p>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <img src="https://via.placeholder.com/300x200?text=Homework" alt="Homework" class="w-full rounded border border-gray-200">
+                            </div>
+                        </div>
+
+                        <!-- Material 3 - Word -->
+                        <div class="file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative">
+                            <div class="flex items-start">
+                                <div class="bg-blue-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-file-word text-blue-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Практические задания</h4>
+                                    <p class="text-sm text-gray-500">DOCX • 1.8 MB</p>
+                                </div>
+                            </div>
+                            <div class="file-actions absolute top-2 right-2">
+                                <a href="/download/material/3" class="text-primary-500 hover:text-primary-700 p-1">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Material 4 - Presentation -->
+                        <div class="file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative">
+                            <div class="flex items-start">
+                                <div class="bg-orange-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-file-powerpoint text-orange-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Презентация</h4>
+                                    <p class="text-sm text-gray-500">PPTX • 5.7 MB</p>
+                                </div>
+                            </div>
+                            <div class="file-actions absolute top-2 right-2">
+                                <a href="/download/material/4" class="text-primary-500 hover:text-primary-700 p-1">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Material 5 - PDF -->
+                        <div class="file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative">
+                            <div class="flex items-start">
+                                <div class="bg-red-100 p-3 rounded-lg mr-3">
+                                    <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-800">Дополнительные материалы</h4>
+                                    <p class="text-sm text-gray-500">PDF • 3.1 MB</p>
+                                </div>
+                            </div>
+                            <div class="file-actions absolute top-2 right-2">
+                                <a href="/download/material/5" class="text-primary-500 hover:text-primary-700 p-1">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Homework submission form -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Отправить домашнее задание</h3>
+                    
+                    <form id="homeworkForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Файл с заданием</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <div class="flex text-sm text-gray-600 justify-center">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-500 hover:text-primary-400 focus-within:outline-none">
+                                            <span>Загрузить файл</span>
+                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                        </label>
+                                        <p class="pl-1">или перетащите сюда</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">
+                                        Форматы: PDF, DOC, DOCX, JPG, PNG<br>
+                                        Максимальный размер: 10MB
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="homework-comment" class="block text-sm font-medium text-gray-700 mb-1">Комментарий (необязательно)</label>
+                            <textarea id="homework-comment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ваши комментарии к заданию..."></textarea>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">
+                                Отправить задание
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Comments section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Комментарии к уроку</h3>
+                        <button id="addCommentBtn" class="px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600 transition">
+                            <i class="fas fa-plus mr-1"></i> Добавить комментарий
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Comment 1 (visible to all) -->
+                        <div class="p-4 border border-gray-200 rounded-lg">
+                            <div class="flex items-start mb-2">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                <div>
+                                    <div class="flex items-center">
+                                        <p class="font-medium text-gray-800">Анна</p>
+                                        <span class="text-xs text-gray-500 ml-2">2 дня назад</span>
+                                    </div>
+                                    <p class="text-gray-700 mt-1">Отличный урок! Особенно понравилось объяснение про формулы сокращённого умножения.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comment 2 (visible only to admins) -->
+                        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50 admin-comment">
+                            <div class="flex items-start mb-2">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                <div>
+                                    <div class="flex items-center">
+                                        <p class="font-medium text-gray-800">Иван Иванович</p>
+                                        <span class="text-xs text-gray-500 ml-2">1 неделю назад</span>
+                                        <span class="text-xs bg-primary-100 text-primary-800 px-2 py-0.5 rounded-full ml-2">Преподаватель</span>
+                                    </div>
+                                    <p class="text-gray-700 mt-1">Напоминаю, что домашнее задание нужно сдать до пятницы. Вопросы можно задавать здесь.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Homework submission (visible only to admins) -->
+                        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50 admin-comment">
+                            <div class="flex items-start mb-2">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                <div>
+                                    <div class="flex items-center">
+                                        <p class="font-medium text-gray-800">Анна</p>
+                                        <span class="text-xs text-gray-500 ml-2">3 дня назад</span>
+                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full ml-2">Домашнее задание</span>
+                                    </div>
+                                    <p class="text-gray-700 mt-1">Прикрепила выполненное задание. Возникли сложности с последним примером.</p>
+                                    <div class="mt-2 flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-paperclip mr-1"></i>
+                                        <span>homework_lesson5.pdf</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add comment form (hidden by default) -->
+                    <div id="commentForm" class="mt-4 hidden">
+                        <form class="space-y-3">
+                            <div>
+                                <label for="comment-text" class="block text-sm font-medium text-gray-700 mb-1">Ваш комментарий</label>
+                                <textarea id="comment-text" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Напишите ваш комментарий..."></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="cancelCommentBtn" class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                                    Отмена
+                                </button>
+                                <button type="submit" class="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">
+                                    Отправить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Edit Lesson Modal -->
+    <div id="editLessonModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Редактировать урок</h3>
+                <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="editLessonForm" class="space-y-4">
+                <div>
+                    <label for="lessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Название урока</label>
+                    <input type="text" id="lessonTitle" value="Урок 5: Алгебраические выражения" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                </div>
+
+                <div>
+                    <label for="lessonVideo" class="block text-sm font-medium text-gray-700 mb-1">Видео урока (Rutube)</label>
+                    <input type="url" id="lessonVideo" value="https://rutube.ru/play/embed/123456789" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Материалы к уроку</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <div class="flex text-sm text-gray-600 justify-center">
+                                <label for="lesson-materials" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-500 hover:text-primary-400 focus-within:outline-none">
+                                    <span>Загрузить файлы</span>
+                                    <input id="lesson-materials" name="lesson-materials" type="file" class="sr-only" multiple>
+                                </label>
+                                <p class="pl-1">или перетащите сюда</p>
+                            </div>
+                            <p class="text-xs text-gray-500">
+                                Форматы: PDF, DOC, DOCX, PPT, PPTX, JPG, PNG
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="uploadedMaterials" class="mt-4 space-y-2">
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                <span>Конспект урока.pdf</span>
+                            </div>
+                            <button type="button" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                            <div class="flex items-center">
+                                <i class="fas fa-image text-blue-500 mr-2"></i>
+                                <span>Домашнее задание.jpg</span>
+                            </div>
+                            <button type="button" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                        Отмена
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifications dropdown -->
+    <div id="notificationsDropdown" class="hidden fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold">Уведомления</h3>
+                <button class="text-sm text-primary-500">Очистить все</button>
+            </div>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Домашнее задание проверено</p>
+                        <p class="text-xs text-gray-600 mt-1">2 часа назад</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Новый урок по теме "Формулы"</p>
+                        <p class="text-xs text-gray-600 mt-1">Вчера, 15:30</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-gray-400 mr-3 mt-1">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Напоминание: тестирование</p>
+                        <p class="text-xs text-gray-600 mt-1">Понедельник, 10:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t border-gray-200 text-center">
+            <a href="notifications.html" class="text-sm text-primary-500 font-medium">Показать все уведомления</a>
+        </div>
+    </div>
+
+    <!-- User menu dropdown -->
+    <div id="userMenuDropdown" class="hidden fixed right-4 top-16 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-2">
+            <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Мой профиль</a>
+            <a href="settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Настройки</a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a href="logout.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Выйти</a>
+        </div>
+    </div>
+
+    <!-- Подключаем JavaScript -->
+    <script src="js/lesson.js"></script>
+</body>
+</html>

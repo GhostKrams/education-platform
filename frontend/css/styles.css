@@ -16,113 +16,34 @@ body {
   min-height: 100vh;
 }
 
+/* Унификация sidebar для всех страниц */
 .sidebar {
-  width: 200px;
-  background-color: #1A2A44;
-  color: #FFFFFF;
+  width: 256px;
+  background-color: #ffffff;
+  color: #1f2937;
   padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .sidebar a {
-  color: #FFFFFF;
+  color: #4b5563;
   display: block;
   margin: 10px 0;
   text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebar a:hover {
+  background-color: #fff7ed;
+  color: #ea580c;
   text-decoration: underline;
-}
-
-.main-content {
-  flex: 1;
-  padding: 20px;
-  background-color: #F5F7FA;
-}
-
-.card {
-  background-color: #F5A623;
-  color: #FFFFFF;
-  padding: 20px;
-  border-radius: 8px;
-  margin: 10px 0;
-}
-
-.assignment, .material, .feedback-form, .support-form {
-    margin: 20px 0;
-  }
-  
-  .assignment p, .material p {
-    margin: 5px 0;
-  }
-  
-  .feedback-form select, .support-form input, .feedback-form textarea, .support-form textarea {
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-    max-width: 400px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .feedback-form textarea, .support-form textarea {
-    height: 100px;
-  }
-  
-  button {
-    background-color: #1A73E8;
-    color: #FFFFFF;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #1557B0;
-  }
-  
-  .lesson {
-    background-color: #FFFFFF;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin: 10px 0;
-  }
-
- /* Стили auth.html */
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-.input-error {
-  border-color: #EF4444; /* red-500 */
-}
-
-.error-message {
-  color: #EF4444; /* red-500 */
-  font-size: 0.875rem; /* text-sm */
-  margin-top: 0.25rem; /* mt-1 */
-}
-
-/* Стили для my-courses.html */
-
-/* Sidebar */
-.sidebar {
-  background-color: #ffffff; /* bg-white */
-  color: #1f2937; /* text-gray-800 */
-  width: 256px; /* w-64 */
-  transition: transform 0.3s ease-in-out; /* Плавный переход, как в примере */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
 }
 
 /* Заголовок (логотип) */
@@ -152,23 +73,6 @@ body {
   margin-bottom: 0.5rem; /* space-y-2 */
 }
 
-.sidebar a {
-  color: #4b5563; /* text-gray-700 */
-  font-size: 1rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem; /* p-3 */
-  border-radius: 0.5rem; /* rounded-lg */
-  transition: background-color 0.2s ease, color 0.2s ease; /* transition */
-}
-
-.sidebar a:hover {
-  background-color: #fff7ed; /* hover:bg-primary-50 */
-  color: #ea580c; /* hover:text-primary-600 */
-}
-
-/* Активный пункт */
 .sidebar a.bg-primary-100 {
   background-color: #ffedd5; /* bg-primary-100 */
   color: #ea580c; /* text-primary-600 */
@@ -210,6 +114,86 @@ body {
   color: #6b7280 !important; /* text-gray-500 */
 }
 
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #F5F7FA;
+}
+
+.card {
+  background-color: #F5A623;
+  color: #FFFFFF;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.assignment, .material, .feedback-form, .support-form {
+  margin: 20px 0;
+}
+
+.assignment p, .material p {
+  margin: 5px 0;
+}
+
+.feedback-form select, .support-form input, .feedback-form textarea, .support-form textarea {
+  margin: 10px 0;
+  padding: 10px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.feedback-form textarea, .support-form textarea {
+  height: 100px;
+}
+
+button {
+  background-color: #1A73E8;
+  color: #FFFFFF;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1557B0;
+}
+
+.lesson {
+  background-color: #FFFFFF;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+/* Стили auth.html */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.input-error {
+  border-color: #EF4444; /* red-500 */
+}
+
+.error-message {
+  color: #EF4444; /* red-500 */
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 0.25rem; /* mt-1 */
+}
+
 /* Overlay */
 .overlay {
   display: none;
@@ -236,6 +220,7 @@ body {
   background-color: #e5e7eb; /* gray-200 */
   overflow: hidden;
 }
+
 .progress-fill {
   height: 100%;
   border-radius: 4px;
@@ -276,9 +261,11 @@ body {
   justify-content: center;
   padding: 1rem;
 }
+
 .modal.active {
   display: flex;
 }
+
 .modal-content {
   background-color: white;
   border-radius: 0.5rem;
@@ -291,6 +278,7 @@ body {
   opacity: 0;
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 }
+
 .modal.active .modal-content {
   transform: scale(1) translateY(0);
   opacity: 1;
@@ -308,9 +296,11 @@ body {
     background-color: #ffffff; /* bg-white */
     color: #1f2937; /* text-gray-800 */
   }
+
   .sidebar.active {
     transform: translateX(0); /* left: 0 */
   }
+
   .overlay {
     display: none;
     position: fixed;
@@ -323,6 +313,7 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
   }
+
   .overlay.active {
     display: block;
     opacity: 1;
@@ -354,4 +345,33 @@ body {
     opacity: 0;
     transform: translateY(-20px);
   }
+}
+
+/* Styles for course-detail.html */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Style for completed lessons */
+.lesson-completed {
+  background-color: #f0fdf4; /* green-50 */
+  border-left: 4px solid #10b981; /* green-600, example */
+}
+
+.lesson-completed .lesson-number-badge {
+  background-color: #10b981 !important; /* green-600 */
+}
+
+/* Styles for lesson.html */
+.file-card:hover .file-actions {
+  opacity: 1;
+}
+
+.file-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }

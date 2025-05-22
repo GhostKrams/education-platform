@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс | Образовательная платформа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                            400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
+                            800: '#9a3412', 900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css"> </head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <div class="md:hidden fixed top-4 left-4 z-50">
+            <button id="menuToggle" class="text-primary-500 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="overlay" class="overlay"></div>
+
+        <aside id="sidebar" class="sidebar w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg">
+            <div class="p-4 border-b border-gray-200">
+                 <a href="index.html" class="text-2xl font-bold text-primary-500">EduPlatform</a>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="my-courses.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-book mr-3 text-primary-400"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="answers-feed.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-stream mr-3 text-primary-400"></i>
+                            <span>Лента ответов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="testing.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-clipboard-check mr-3 text-primary-400"></i>
+                            <span>Тестирование</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="schedule.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-calendar-alt mr-3 text-primary-400"></i>
+                            <span>Расписание</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-user mr-3 text-primary-400"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-200 mt-auto">
+                <div class="flex items-center">
+                    <img src="assets/images/default-avatar.png" alt="Profile" id="sidebarUserAvatar" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <p class="font-medium" id="sidebarUserName">Анна</p>
+                        <p class="text-sm text-gray-500" id="sidebarUserRole">Студент</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 overflow-auto">
+            <div id="notificationPopupContainer" class="fixed top-4 right-4 z-[1100] w-full max-w-sm pointer-events-none">
+                 </div>
+
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <a href="my-courses.html" class="text-primary-500 hover:text-primary-700" aria-label="Назад к курсам">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 id="courseTitleHeader" class="text-2xl font-bold text-gray-800">Название курса...</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notificationsBtn" class="text-gray-600 hover:text-primary-500 focus:outline-none relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="notification-badge hidden" id="notificationCountBadge">0</span>
+                            </button>
+                        </div>
+                        <div class="hidden md:block">
+                            <button id="userMenuBtn" class="flex items-center text-gray-600 hover:text-primary-500 focus:outline-none">
+                                <img src="assets/images/default-avatar.png" alt="Profile" id="headerUserAvatar" class="w-8 h-8 rounded-full mr-2">
+                                <span class="font-medium" id="headerUserName">Анна</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-gray-700">Прогресс курса: <span id="courseProgressPercent">0%</span></span>
+                        <span class="text-sm text-gray-500"><span id="completedLessonsCount">0</span> из <span id="totalLessonsCount">0</span> уроков</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="courseProgressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <button data-tab="content" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-primary-500 text-primary-600" aria-current="page">
+                            Содержание
+                        </button>
+                        <button data-tab="students" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Ученики
+                        </button>
+                        <button data-tab="stats" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Статистика
+                        </button>
+                    </nav>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <div id="content" class="tab-content active">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h2 class="text-lg font-medium text-gray-900">Уроки курса</h2>
+                            <button id="addLessonBtn" class="px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600 transition flex items-center hidden"> <i class="fas fa-plus mr-1"></i> Добавить урок
+                            </button>
+                        </div>
+                        
+                        <ul id="lessonsList" class="divide-y divide-gray-200">
+                            <p id="lessonsLoadingMsg" class="p-6 text-gray-500">Загрузка уроков...</p>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="students" class="tab-content">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-medium text-gray-900">Ученики курса</h2>
+                        </div>
+                        <div id="studentsList" class="divide-y divide-gray-200">
+                            <p id="studentsLoadingMsg" class="p-6 text-gray-500">Загрузка списка учеников...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="stats" class="tab-content">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-medium text-gray-900">Статистика курса</h2>
+                        </div>
+                        <div id="courseStatsContent" class="p-6">
+                            <p id="statsLoadingMsg" class="text-gray-500">Загрузка статистики...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="addLessonModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Добавить новый урок</h3>
+                <button id="closeAddLessonModalBtn" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="addLessonForm" class="space-y-4">
+                <div>
+                    <label for="lessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Название урока</label>
+                    <input type="text" id="lessonTitle" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+                </div>
+                <div>
+                    <label for="lessonDescription" class="block text-sm font-medium text-gray-700 mb-1">Описание урока</label>
+                    <textarea id="lessonDescription" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"></textarea>
+                </div>
+                <div>
+                    <label for="lessonDate" class="block text-sm font-medium text-gray-700 mb-1">Дата урока (если применимо)</label>
+                    <input type="date" id="lessonDate" name="lesson_date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelAddLessonBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">Отмена</button>
+                    <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">Добавить урок</button>
+                </div>
+                <p id="addLessonFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+            </form>
+        </div>
+    </div>
+    
+    <div id="notificationsDropdown" class="hidden fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg z-[1060] border border-gray-200">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="font-semibold">Уведомления</h3>
+            <button id="clearNotificationsBtn" class="text-sm text-primary-500 hover:text-primary-600">Очистить все</button>
+        </div>
+        <div id="notificationsListContainer" class="max-h-96 overflow-y-auto">
+            <p class="p-4 text-sm text-gray-500">Загрузка уведомлений...</p>
+        </div>
+        <div class="p-3 border-t border-gray-200 text-center">
+            <a href="notifications.html" class="text-sm text-primary-500 font-medium hover:text-primary-600">Показать все уведомления</a>
+        </div>
+    </div>
+
+    <div id="userMenuDropdown" class="hidden fixed right-4 top-16 w-56 bg-white rounded-lg shadow-lg z-[1060] border border-gray-200">
+        <div class="p-2">
+            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Мой профиль</a>
+            <a href="settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Настройки</a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a href="#" id="logoutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Выйти</a>
+        </div>
+    </div>
+
+    <script src="js/course-detail.js"></script> </body>
+</html>
