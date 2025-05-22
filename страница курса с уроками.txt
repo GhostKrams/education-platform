@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс | Образовательная платформа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #f97316;
+            transition: width 0.3s ease;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .lesson-completed {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+        .file-preview {
+            transition: all 0.2s ease;
+        }
+        .file-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Mobile menu button -->
+        <div class="md:hidden fixed top-4 left-4 z-50">
+            <button id="menuToggle" class="text-primary-500 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Overlay for mobile menu -->
+        <div id="overlay" class="overlay"></div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg">
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-primary-500">EduPlatform</h1>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/courses" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-book mr-3 text-primary-400"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/answers-feed" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-stream mr-3 text-primary-400"></i>
+                            <span>Лента ответов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/testing" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-clipboard-check mr-3 text-primary-400"></i>
+                            <span>Тестирование</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/materials" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-file-alt mr-3 text-primary-400"></i>
+                            <span>Материалы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/schedule" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-calendar-alt mr-3 text-primary-400"></i>
+                            <span>Расписание</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/profile" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-user mr-3 text-primary-400"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-200 mt-auto">
+                <div class="flex items-center">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <p class="font-medium">Анна</p>
+                        <p class="text-sm text-gray-500">Студент</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Notification popup -->
+            <div id="notificationPopup" class="bg-primary-100 text-primary-800 p-3 shadow-md flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-bell mr-2"></i>
+                    <span>У вас новое уведомление: Домашнее задание проверено</span>
+                </div>
+                <button onclick="closeNotification()" class="text-primary-500 hover:text-primary-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <a href="/courses" class="text-primary-500 hover:text-primary-700">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-2xl font-bold text-gray-800">Годовой курс 2024–2025 — ОГЭ</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notificationsBtn" class="text-gray-600 hover:text-primary-500 focus:outline-none relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="notification-badge">2</span>
+                            </button>
+                        </div>
+                        <div class="hidden md:block">
+                            <button id="userMenuBtn" class="flex items-center text-gray-600 hover:text-primary-500 focus:outline-none">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                                <span class="font-medium">Анна</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Course progress -->
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm font-medium text-gray-700">Прогресс курса: 75%</span>
+                        <span class="text-sm text-gray-500">12 из 16 уроков</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%"></div>
+                    </div>
+                </div>
+                
+                <!-- Course tabs -->
+                <div class="mt-4 border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-8">
+                        <button data-tab="content" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-primary-500 text-primary-600">
+                            Содержание
+                        </button>
+                        <button data-tab="students" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Ученики
+                        </button>
+                        <button data-tab="stats" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            Статистика
+                        </button>
+                    </nav>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Content tab -->
+                <div id="content" class="tab-content active">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <!-- Lesson list header -->
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h2 class="text-lg font-medium text-gray-900">Уроки курса</h2>
+                            <button id="addLessonBtn" class="px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600 transition flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Добавить урок
+                            </button>
+                        </div>
+                        
+                        <!-- Lesson list -->
+                        <ul class="divide-y divide-gray-200">
+                            <!-- Lesson 1 -->
+                            <li class="px-6 py-4 hover:bg-gray-50 transition lesson-item" data-lesson-id="1">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 pt-1">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-primary-500 text-white">
+                                            <span class="font-medium">1</span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-base font-medium text-gray-900">Алгебраические выражения</h3>
+                                            <span class="text-sm text-gray-500">12.04.2024</span>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">Основные понятия алгебры, работа с выражениями, упрощение.</p>
+                                        
+                                        <!-- Lesson materials -->
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-video mr-1"></i> Видео урока
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-file-pdf mr-1"></i> Конспект (PDF)
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800">
+                                                <i class="fas fa-file-alt mr-1"></i> Домашнее задание
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <button class="mark-completed-btn px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm hover:bg-green-200 transition flex items-center">
+                                            <i class="fas fa-check mr-1"></i> Просмотрено
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Lesson 2 -->
+                            <li class="px-6 py-4 hover:bg-gray-50 transition lesson-item" data-lesson-id="2">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 pt-1">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-primary-500 text-white">
+                                            <span class="font-medium">2</span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-base font-medium text-gray-900">Линейные уравнения</h3>
+                                            <span class="text-sm text-gray-500">19.04.2024</span>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">Решение линейных уравнений с одной переменной, примеры задач.</p>
+                                        
+                                        <!-- Lesson materials -->
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-video mr-1"></i> Видео урока
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-file-pdf mr-1"></i> Конспект (PDF)
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <button class="mark-completed-btn px-3 py-1 border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-50 transition flex items-center">
+                                            <i class="fas fa-check mr-1"></i> Отметить просмотренным
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Lesson 3 -->
+                            <li class="px-6 py-4 hover:bg-gray-50 transition lesson-item" data-lesson-id="3">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 pt-1">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-primary-500 text-white">
+                                            <span class="font-medium">3</span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-base font-medium text-gray-900">Квадратные уравнения</h3>
+                                            <span class="text-sm text-gray-500">26.04.2024</span>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">Формулы решения квадратных уравнений, дискриминант, теорема Виета.</p>
+                                        
+                                        <!-- Lesson materials -->
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-video mr-1"></i> Видео урока
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-file-pdf mr-1"></i> Конспект (PDF)
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-purple-100 text-purple-800">
+                                                <i class="fas fa-file-alt mr-1"></i> Домашнее задание
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <button class="mark-completed-btn px-3 py-1 border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-50 transition flex items-center">
+                                            <i class="fas fa-check mr-1"></i> Отметить просмотренным
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                            
+                            <!-- Lesson 4 (completed example) -->
+                            <li class="px-6 py-4 hover:bg-gray-50 transition lesson-completed lesson-item" data-lesson-id="4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 pt-1">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-green-500 text-white">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-base font-medium text-gray-900">Системы уравнений</h3>
+                                            <span class="text-sm text-gray-500">03.05.2024</span>
+                                        </div>
+                                        <p class="mt-1 text-sm text-gray-500">Методы решения систем линейных уравнений: подстановка, сложение, графический метод.</p>
+                                        
+                                        <!-- Lesson materials -->
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-video mr-1"></i> Видео урока
+                                            </a>
+                                            <a href="#" class="inline-flex items-center px-2.5 py-1.5 rounded-md text-xs font-medium bg-green-100 text-green-800">
+                                                <i class="fas fa-file-pdf mr-1"></i> Конспект (PDF)
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <button class="mark-completed-btn px-3 py-1 bg-green-100 text-green-800 rounded-md text-sm hover:bg-green-200 transition flex items-center">
+                                            <i class="fas fa-check mr-1"></i> Просмотрено
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Students tab (visible only for admin) -->
+                <div id="students" class="tab-content">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-medium text-gray-900">Ученики курса</h2>
+                        </div>
+                        
+                        <!-- Students list -->
+                        <div class="divide-y divide-gray-200">
+                            <!-- Student 1 -->
+                            <div class="px-6 py-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/12.jpg" alt="Student" class="w-10 h-10 rounded-full mr-4">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                            <a href="/student/1" class="hover:text-primary-600">Иванова Мария</a>
+                                        </p>
+                                        <p class="text-sm text-gray-500 truncate">Последний вход: 2 часа назад</p>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Активен
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Student 2 -->
+                            <div class="px-6 py-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Student" class="w-10 h-10 rounded-full mr-4">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                            <a href="/student/2" class="hover:text-primary-600">Петров Алексей</a>
+                                        </p>
+                                        <p class="text-sm text-gray-500 truncate">Последний вход: 5 дней назад</p>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            Неактивен
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Student 3 -->
+                            <div class="px-6 py-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Student" class="w-10 h-10 rounded-full mr-4">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                            <a href="/student/3" class="hover:text-primary-600">Смирнова Екатерина</a>
+                                        </p>
+                                        <p class="text-sm text-gray-500 truncate">Последний вход: вчера</p>
+                                    </div>
+                                    <div class="ml-4 flex-shrink-0">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Активен
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats tab (visible only for admin) -->
+                <div id="stats" class="tab-content">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h2 class="text-lg font-medium text-gray-900">Статистика курса</h2>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Completion stats -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-base font-medium text-gray-900 mb-4">Прогресс прохождения</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium text-gray-700">Урок 1: Алгебраические выражения</span>
+                                                <span class="text-sm text-gray-500">85%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 85%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium text-gray-700">Урок 2: Линейные уравнения</span>
+                                                <span class="text-sm text-gray-500">72%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 72%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span class="text-sm font-medium text-gray-700">Урок 3: Квадратные уравнения</span>
+                                                <span class="text-sm text-gray-500">65%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 65%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Homework stats -->
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h3 class="text-base font-medium text-gray-900 mb-4">Домашние задания</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-700">Всего заданий</span>
+                                            <span class="text-sm font-medium text-gray-900">24</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-700">Выполнено</span>
+                                            <span class="text-sm font-medium text-green-600">18 (75%)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-700">На проверке</span>
+                                            <span class="text-sm font-medium text-yellow-600">4 (17%)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-gray-700">Не выполнено</span>
+                                            <span class="text-sm font-medium text-red-600">2 (8%)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Attendance chart -->
+                            <div class="mt-6 bg-gray-50 p-4 rounded-lg">
+                                <h3 class="text-base font-medium text-gray-900 mb-4">Посещаемость уроков</h3>
+                                <div class="h-64 flex items-center justify-center">
+                                    <p class="text-gray-500">Здесь будет график посещаемости</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Lesson Modal -->
+    <div id="addLessonModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Добавить новый урок</h3>
+                <button onclick="closeAddLessonModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="lessonForm" class="space-y-4">
+                <div>
+                    <label for="lessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Название урока</label>
+                    <input type="text" id="lessonTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                </div>
+                
+                <div>
+                    <label for="lessonDescription" class="block text-sm font-medium text-gray-700 mb-1">Описание урока</label>
+                    <textarea id="lessonDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required></textarea>
+                </div>
+                
+                <div>
+                    <label for="lessonDate" class="block text-sm font-medium text-gray-700 mb-1">Дата проведения</label>
+                    <input type="date" id="lessonDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                </div>
+                
+                <div>
+                    <label for="videoUrl" class="block text-sm font-medium text-gray-700 mb-1">Ссылка на видео (RuTube или YouTube)</label>
+                    <input type="url" id="videoUrl" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="https://rutube.ru/video/...">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Материалы к уроку</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                        <div class="space-y-1 text-center">
+                            <div class="flex text-sm text-gray-600">
+                                <label for="lessonMaterials" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none">
+                                    <span>Загрузить файлы</span>
+                                    <input id="lessonMaterials" type="file" class="sr-only" multiple>
+                                </label>
+                                <p class="pl-1">или перетащите сюда</p>
+                            </div>
+                            <p class="text-xs text-gray-500">PDF, DOCX, JPG, PNG до 10MB</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview of uploaded files -->
+                    <div id="filePreviews" class="mt-2 grid grid-cols-2 gap-2 hidden">
+                        <div class="file-preview p-2 border border-gray-200 rounded-md flex items-center">
+                            <div class="flex-shrink-0 text-blue-500 mr-2">
+                                <i class="fas fa-file-pdf text-lg"></i>
+                            </div>
+                            <div class="truncate flex-1">
+                                <p class="text-sm font-medium text-gray-900 truncate">Конспект урока.pdf</p>
+                                <p class="text-xs text-gray-500">2.4 MB</p>
+                            </div>
+                            <button class="text-gray-400 hover:text-gray-500 ml-2">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeAddLessonModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                        Отмена
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">
+                        Добавить урок
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notifications dropdown -->
+    <div id="notificationsDropdown" class="hidden fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold">Уведомления</h3>
+                <button class="text-sm text-primary-500">Очистить все</button>
+            </div>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Домашнее задание проверено</p>
+                        <p class="text-xs text-gray-600 mt-1">2 часа назад</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Новый урок по теме "Формулы"</p>
+                        <p class="text-xs text-gray-600 mt-1">Вчера, 15:30</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-gray-400 mr-3 mt-1">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Напоминание: тестирование</p>
+                        <p class="text-xs text-gray-600 mt-1">Понедельник, 10:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t border-gray-200 text-center">
+            <a href="/notifications" class="text-sm text-primary-500 font-medium">Показать все уведомления</a>
+        </div>
+    </div>
+
+    <!-- User menu dropdown -->
+    <div id="userMenuDropdown" class="hidden fixed right-4 top-16 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-2">
+            <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Мой профиль</a>
+            <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Настройки</a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Выйти</a>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Notifications dropdown
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const notificationsDropdown = document.getElementById('notificationsDropdown');
+
+        notificationsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationsDropdown.classList.toggle('hidden');
+            userMenuDropdown.classList.add('hidden');
+        });
+
+        // User menu dropdown
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+        if (userMenuBtn) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenuDropdown.classList.toggle('hidden');
+                notificationsDropdown.classList.add('hidden');
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notificationsDropdown.contains(e.target) && e.target !== notificationsBtn) {
+                notificationsDropdown.classList.add('hidden');
+            }
+            if (!userMenuDropdown.contains(e.target) && e.target !== userMenuBtn) {
+                userMenuDropdown.classList.add('hidden');
+            }
+        });
+
+        // Close dropdowns on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                notificationsDropdown.classList.add('hidden');
+                userMenuDropdown.classList.add('hidden');
+            }
+        });
+
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-primary-500', 'text-primary-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                button.classList.add('border-primary-500', 'text-primary-600');
+                button.classList.remove('border-transparent', 'text-gray-500');
+                
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Add lesson modal
+        const addLessonBtn = document.getElementById('addLessonBtn');
+        const addLessonModal = document.getElementById('addLessonModal');
+
+        function openAddLessonModal() {
+            addLessonModal.classList.add('active');
+        }
+
+        function closeAddLessonModal() {
+            addLessonModal.classList.remove('active');
+        }
+
+        if (addLessonBtn) {
+            addLessonBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openAddLessonModal();
+            });
+        }
+
+        // Close modal when clicking outside
+        addLessonModal.addEventListener('click', (e) => {
+            if (e.target === addLessonModal) {
+                closeAddLessonModal();
+            }
+        });
+
+        // Lesson form submission
+        const lessonForm = document.getElementById('lessonForm');
+        if (lessonForm) {
+            lessonForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Here you would typically send the data to your backend
+                alert('Урок успешно добавлен!');
+                closeAddLessonModal();
+                lessonForm.reset();
+            });
+        }
+
+        // File upload preview
+        const lessonMaterialsInput = document.getElementById('lessonMaterials');
+        const filePreviewsContainer = document.getElementById('filePreviews');
+
+        if (lessonMaterialsInput) {
+            lessonMaterialsInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    filePreviewsContainer.classList.remove('hidden');
+                    // In a real app, you would generate previews for each file
+                } else {
+                    filePreviewsContainer.classList.add('hidden');
+                }
+            });
+        }
+
+        // Mark lesson as completed
+        const markCompletedButtons = document.querySelectorAll('.mark-completed-btn');
+        
+        markCompletedButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const lessonItem = this.closest('.lesson-item');
+                const isCompleted = lessonItem.classList.contains('lesson-completed');
+                
+                if (isCompleted) {
+                    // In a real app, you would send a request to mark as not completed
+                    lessonItem.classList.remove('lesson-completed');
+                    this.classList.remove('bg-green-100', 'text-green-800');
+                    this.classList.add('border', 'border-gray-300', 'text-gray-700');
+                    this.innerHTML = '<i class="fas fa-check mr-1"></i> Отметить просмотренным';
+                } else {
+                    // In a real app, you would send a request to mark as completed
+                    lessonItem.classList.add('lesson-completed');
+                    this.classList.add('bg-green-100', 'text-green-800');
+                    this.classList.remove('border', 'border-gray-300', 'text-gray-700');
+                    this.innerHTML = '<i class="fas fa-check mr-1"></i> Просмотрено';
+                }
+            });
+        });
+
+        // Notification popup
+        function closeNotification() {
+            document.getElementById('notificationPopup').style.display = 'none';
+        }
+
+        // Simulate admin status (for demo purposes)
+        const isAdmin = true; // Change to false to see student view
+        
+        if (isAdmin) {
+            // Show admin tabs and buttons
+            document.querySelectorAll('[data-tab="students"], [data-tab="stats"]').forEach(el => {
+                el.style.display = 'block';
+            });
+            document.getElementById('addLessonBtn').style.display = 'flex';
+        } else {
+            // Hide admin tabs and buttons for regular students
+            document.querySelectorAll('[data-tab="students"], [data-tab="stats"]').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById('addLessonBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
