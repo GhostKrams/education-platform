@@ -375,3 +375,50 @@ button:hover {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
+
+/* Styles specific to answers-feed.html */
+.file-preview {
+    max-width: 100%; /* [cite: 16] */
+    /* max-height: 200px; */ /* [cite: 17] */ /* Allowing dynamic height for better display */
+    border-radius: 0.5rem; /* [cite: 17] */
+    border: 1px solid #e5e7eb; /* [cite: 17] */
+    object-fit: cover; /* Ensures image covers the area well */
+    aspect-ratio: 16 / 9; /* Common aspect ratio for previews */
+}
+
+.comment-reply {
+    margin-left: 2rem; /* [cite: 17] */
+    border-left: 2px solid #e5e7eb; /* [cite: 18] */
+    padding-left: 1rem; /* [cite: 18] */
+}
+
+.status-badge {
+    display: inline-flex; /* [cite: 18] */
+    align-items: center; /* [cite: 19] */
+    padding: 0.25rem 0.75rem; /* Adjusted padding for better look */ /* [cite: 19] */
+    border-radius: 9999px; /* [cite: 19] */
+    font-size: 0.75rem; /* [cite: 19] */
+    font-weight: 500; /* [cite: 19] */
+    line-height: 1;
+}
+.status-pending { /* Waiting for teacher */
+    background-color: #fef3c7; /* yellow-100 */ /* [cite: 20] */
+    color: #92400e; /* amber-700 */ /* [cite: 21] */
+}
+.status-approved { /* Graded positively */
+    background-color: #d1fae5; /* green-100 */ /* [cite: 21] */
+    color: #065f46; /* green-800 */ /* [cite: 22] */
+}
+.status-rejected { /* Graded negatively / needs rework */
+    background-color: #fee2e2; /* red-100 */ /* [cite: 22] */
+    color: #991b1b; /* red-800 */ /* [cite: 23] */
+}
+.status-viewed { /* Teacher has viewed but not graded/responded */
+    background-color: #e0e7ff; /* indigo-100 */ /* [cite: 23] */
+    color: #3730a3; /* indigo-800 */ /* [cite: 24] */
+}
+/* New status for student submissions that are not yet viewed by teacher */
+.status-submitted {
+    background-color: #f3f4f6; /* gray-100 */
+    color: #4b5563; /* gray-600 */
+}
