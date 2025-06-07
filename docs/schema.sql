@@ -1,4 +1,3 @@
-
 -- Создаём пользовательский тип для роли
 CREATE TYPE role_type AS ENUM ('Student', 'Teacher', 'Admin', 'Moderator', 'Parent');
 
@@ -26,9 +25,14 @@ CREATE TABLE Courses (
 -- Таблица CourseEnrollments
 CREATE TABLE CourseEnrollments (
   EnrollmentID SERIAL PRIMARY KEY,
-  UserID INTEGER REFERENCES Users(UserID),
+  UserID INTEGER REFERENCES Users(UserID), 
   CourseID INTEGER REFERENCES Courses(CourseID),
-  EnrolledAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  EnrolledAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR(50) DEFAULT 'active', 
+  progress INTEGER DEFAULT 0,        
+  lessons_completed INTEGER DEFAULT 0,  
+  total_lessons INTEGER DEFAULT 0,      
+  UNIQUE (UserID, CourseID)            
 );
 
 -- Таблица Lessons
@@ -80,4 +84,29 @@ CREATE TABLE Messages (
   ToUserID INTEGER REFERENCES Users(UserID),
   MessageText TEXT,
   SentAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Таблица LessonMaterials
+CREATE TABLE LessonMaterials (
+  MaterialID SERIAL PRIMARY KEY,
+  LessonID INTEGER REFERENCES Lessons(LessonID),
+  FilePath VARCHAR(255) NOT NULL,
+  FileName VARCHAR(255) NOT NULL,
+  FileType VARCHAR(50) NOT NULL, -- Например, 'pdf', 'jpg', 'docx', 'pptx'
+  FileSize BIGINT, -- Размер файла в байтах
+  UploadedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UploadedBy INTEGER REFERENCES Users(UserID)
+);
+
+-- Таблица LessonComments
+CREATE TABLE LessonComments (
+  CommentID SERIAL PRIMARY KEY,
+  LessonID INTEGER REFERENCES Lessons(LessonID),
+  UserID INTEGER REFERENCES Users(UserID),
+  CommentText TEXT NOT NULL,
+  CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  IsTeacherComment BOOLEAN DEFAULT FALSE, -- Флаг для комментариев преподавателя
+  IsHomeworkSubmission BOOLEAN DEFAULT FALSE, -- Флаг для комментариев с домашкой
+  SubmissionFilePath VARCHAR(255), -- Путь к файлу, если это сдача ДЗ
+  SubmissionFileName VARCHAR(255) -- Имя файла, если это сдача ДЗ
 );

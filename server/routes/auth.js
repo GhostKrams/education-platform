@@ -3,9 +3,6 @@ const router = express.Router();
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const jwt = require('jsonwebtoken'); // Добавляем библиотеку JWT
-
-const JWT_SECRET = 'your_jwt_secret_key'; // Храните в .env в продакшене
 
 const resetCodes = {};
 
@@ -108,16 +105,9 @@ router.post('/register', async (req, res) => {
     }
 
     const user = insertResult.rows[0];
-    const token = jwt.sign(
-      { userId: user.userid, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
     res.json({
       success: true,
       message: 'Регистрация успешна',
-      token,
       user: {
         userId: user.userid,
         fullname: user.fullname,
@@ -146,16 +136,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Неверный email или пароль' });
     }
 
-    const token = jwt.sign(
-      { userId: user.userid, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
     res.json({
       success: true,
       message: 'Вход выполнен',
-      token,
       user: {
         userId: user.userid,
         fullname: user.fullname,
@@ -170,17 +153,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Получение данных пользователя (без проверки токена)
 router.get('/users/me', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ message: 'Токен не предоставлен' });
+  const { email } = req.query; // Теперь email передаётся через query-параметр
+  if (!email) {
+    return res.status(400).json({ message: 'Email не предоставлен' });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
     const userResult = await pool.query(
-      'SELECT userid, fullname, email, role FROM users WHERE userid = $1',
-      [decoded.userId]
+      'SELECT userid, fullname, email, role FROM users WHERE email = $1',
+      [email]
     );
     if (userResult.rows.length === 0) {
       return res.status(404).json({ message: 'Пользователь не найден' });
@@ -188,7 +171,7 @@ router.get('/users/me', async (req, res) => {
     res.json({ user: userResult.rows[0] });
   } catch (error) {
     console.error('Ошибка получения данных пользователя:', error);
-    res.status(401).json({ message: 'Неверный или истёкший токен' });
+    res.status(500).json({ message: 'Ошибка сервера' });
   }
 });
 

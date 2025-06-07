@@ -417,8 +417,14 @@ button:hover {
     background-color: #e0e7ff; /* indigo-100 */ /* [cite: 23] */
     color: #3730a3; /* indigo-800 */ /* [cite: 24] */
 }
-/* New status for student submissions that are not yet viewed by teacher */
 .status-submitted {
     background-color: #f3f4f6; /* gray-100 */
     color: #4b5563; /* gray-600 */
 }
+
+/* Добавим базовый стиль для контейнера курсов */
+#activeCoursesList {
+    min-height: 200px;
+    background-color: #ffffff;
+}
+

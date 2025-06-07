@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeForgotPasswordBtn = document.getElementById('close-forgot-password');
     const sendCodeBtn = document.getElementById('send-code-btn');
     const verifyCodeBtn = document.getElementById('verify-code-btn');
-    const resendCodeBtn = document.getElementById('resend-code-btn'); // Добавлено
+    const resendCodeBtn = document.getElementById('resend-code-btn');
     const changePasswordBtn = document.getElementById('change-password-btn');
 
     // Элементы форм
@@ -44,18 +44,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const changePasswordError = document.getElementById('change-password-error');
     const sentToEmailSpan = document.getElementById('sent-to-email');
 
+    const API_BASE_URL = 'http://localhost:3000/api/auth'; // Уточнённый базовый URL для API
 
     // --- Переключение между формами ---
     switchToRegisterBtn.addEventListener('click', () => {
         loginForm.classList.add('hidden');
         registerForm.classList.remove('hidden');
-        clearFormErrors(); // Очистка ошибок при переключении
+        clearFormErrors();
     });
 
     switchToLoginBtn.addEventListener('click', () => {
         registerForm.classList.add('hidden');
         loginForm.classList.remove('hidden');
-        clearFormErrors(); // Очистка ошибок при переключении
+        clearFormErrors();
     });
 
     // --- Модальное окно восстановления пароля ---
@@ -64,9 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         step1.classList.remove('hidden');
         step2.classList.add('hidden');
         step3.classList.add('hidden');
-        successMessageDiv.classList.add('hidden'); // Скрыть сообщение об успехе
-        clearFormErrors(); // Очистить ошибки при открытии
-        recoveryEmailInput.value = ''; // Очистить поле email
+        successMessageDiv.classList.add('hidden');
+        clearFormErrors();
+        recoveryEmailInput.value = '';
     });
 
     closeForgotPasswordBtn.addEventListener('click', () => {
@@ -85,47 +86,39 @@ document.addEventListener('DOMContentLoaded', () => {
             recoveryEmailInput.classList.add('input-error');
             return;
         }
-        showLoading(sendCodeBtn); // Показать индикатор загрузки
+        showLoading(sendCodeBtn);
 
         try {
-             // !!! ЗАМЕНИТЬ НА FETCH К ВАШЕМУ API (/api/auth/forgot-password) !!!
-            console.log(`Запрос на отправку кода для ${email}`);
-            // Пример fetch:
-            // const response = await fetch('/api/auth/forgot-password', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email })
-            // });
-            // const data = await response.json();
-            // if (!response.ok) throw new Error(data.message || 'Ошибка отправки кода');
+            const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Ошибка отправки кода');
 
-            // --- Если успешно ---
-            console.log('Код отправлен (симуляция)');
-            sentToEmailSpan.textContent = email; // Показываем email, куда отправлен код
+            sentToEmailSpan.textContent = email;
             step1.classList.add('hidden');
             step2.classList.remove('hidden');
-            verificationCodeInput.value = ''; // Очистить поле кода
-            // --- Конец успешного блока ---
-
+            verificationCodeInput.value = '';
         } catch (error) {
             console.error("Ошибка отправки кода:", error);
             showError(recoveryEmailError, error.message || 'Не удалось отправить код. Попробуйте позже.');
             recoveryEmailInput.classList.add('input-error');
         } finally {
-             hideLoading(sendCodeBtn, 'Отправить код'); // Скрыть индикатор загрузки
+            hideLoading(sendCodeBtn, 'Отправить код');
         }
     });
 
-    // Повторная отправка кода (аналогично первой отправке)
+    // Повторная отправка кода
     resendCodeBtn.addEventListener('click', () => {
-         sendCodeBtn.click(); // Просто симулируем клик по основной кнопке
+        sendCodeBtn.click();
     });
-
 
     // Шаг 2: Подтверждение кода
     verifyCodeBtn.addEventListener('click', async () => {
         const code = verificationCodeInput.value.trim();
-        const email = recoveryEmailInput.value.trim(); // Берем email из предыдущего шага
+        const email = recoveryEmailInput.value.trim();
         clearFormErrors();
 
         if (!code) {
@@ -134,34 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        showLoading(verifyCodeBtn); // Показать индикатор загрузки
+        showLoading(verifyCodeBtn);
 
         try {
-             // !!! ЗАМЕНИТЬ НА FETCH К ВАШЕМУ API (/api/auth/verify-code) !!!
-             console.log(`Запрос на проверку кода ${code} для ${email}`);
-            // Пример fetch:
-            // const response = await fetch('/api/auth/verify-code', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ email, code })
-            // });
-            // const data = await response.json();
-            // if (!response.ok) throw new Error(data.message || 'Ошибка проверки кода');
+            const response = await fetch(`${API_BASE_URL}/verify-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Ошибка проверки кода');
 
-            // --- Если успешно ---
-            console.log('Код подтвержден (симуляция)');
             step2.classList.add('hidden');
             step3.classList.remove('hidden');
-            newPasswordInput.value = ''; // Очистить поля паролей
+            newPasswordInput.value = '';
             confirmNewPasswordInput.value = '';
-            // --- Конец успешного блока ---
-
         } catch (error) {
             console.error("Ошибка проверки кода:", error);
-            showError(verificationCodeError, error.message || 'Неверный код или срок действия истек.');
+            showError(verificationCodeError, error.message || 'Неверный код или срок действия истёк.');
             verificationCodeInput.classList.add('input-error');
         } finally {
-             hideLoading(verifyCodeBtn, 'Подтвердить'); // Скрыть индикатор загрузки
+            hideLoading(verifyCodeBtn, 'Подтвердить');
         }
     });
 
@@ -169,8 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     changePasswordBtn.addEventListener('click', async () => {
         const newPassword = newPasswordInput.value;
         const confirmNewPassword = confirmNewPasswordInput.value;
-        const email = recoveryEmailInput.value.trim(); // Email с первого шага
-        const code = verificationCodeInput.value.trim(); // Код со второго шага
+        const email = recoveryEmailInput.value.trim();
         clearFormErrors();
 
         if (!newPassword || !confirmNewPassword) {
@@ -187,45 +172,36 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Доп. проверка сложности пароля (пример)
         if (newPassword.length < 6) {
-             showError(changePasswordError, 'Пароль должен быть не менее 6 символов');
-             newPasswordInput.classList.add('input-error');
-             confirmNewPasswordInput.classList.add('input-error');
-             return;
+            showError(changePasswordError, 'Пароль должен быть не менее 6 символов');
+            newPasswordInput.classList.add('input-error');
+            confirmNewPasswordInput.classList.add('input-error');
+            return;
         }
 
-         showLoading(changePasswordBtn); // Показать индикатор загрузки
+        showLoading(changePasswordBtn);
 
         try {
-             // !!! ЗАМЕНИТЬ НА FETCH К ВАШЕМU API (/api/auth/reset-password) !!!
-             console.log(`Запрос на смену пароля для ${email} с кодом ${code}`);
-             // Пример fetch:
-             // const response = await fetch('/api/auth/reset-password', {
-             //     method: 'POST',
-             //     headers: { 'Content-Type': 'application/json' },
-             //     body: JSON.stringify({ email, code, newPassword })
-             // });
-             // const data = await response.json();
-             // if (!response.ok) throw new Error(data.message || 'Ошибка смены пароля');
+            const response = await fetch(`${API_BASE_URL}/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, newPassword })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Ошибка смены пароля');
 
-             // --- Если успешно ---
-             console.log('Пароль изменен (симуляция)');
-             showSuccess('Пароль успешно изменен!');
-             setTimeout(() => {
-                 forgotPasswordModal.classList.add('hidden');
-                 switchToLoginBtn.click(); // Переключаемся на форму входа
-             }, 2000); // Закрыть окно через 2 секунды
-             // --- Конец успешного блока ---
-
+            showSuccess('Пароль успешно изменён!');
+            setTimeout(() => {
+                forgotPasswordModal.classList.add('hidden');
+                switchToLoginBtn.click();
+            }, 2000);
         } catch (error) {
             console.error("Ошибка изменения пароля:", error);
             showError(changePasswordError, error.message || 'Не удалось изменить пароль. Попробуйте позже.');
         } finally {
-            hideLoading(changePasswordBtn, 'Изменить пароль'); // Скрыть индикатор загрузки
+            hideLoading(changePasswordBtn, 'Изменить пароль');
         }
     });
-
 
     // --- Валидация паролей при вводе ---
     confirmPasswordInput.addEventListener('input', () => {
@@ -235,17 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmNewPasswordInput.addEventListener('input', () => {
         validatePasswordMatch(newPasswordInput, confirmNewPasswordInput, newPasswordMatchError);
     });
-    // Убираем ошибку при изменении основного пароля
-     registerPasswordInput.addEventListener('input', () => {
-         if (confirmPasswordInput.value) {
-             validatePasswordMatch(registerPasswordInput, confirmPasswordInput, passwordMatchError);
-         }
-     });
-     newPasswordInput.addEventListener('input', () => {
-         if (confirmNewPasswordInput.value) {
-             validatePasswordMatch(newPasswordInput, confirmNewPasswordInput, newPasswordMatchError);
-         }
-     });
+
+    registerPasswordInput.addEventListener('input', () => {
+        if (confirmPasswordInput.value) {
+            validatePasswordMatch(registerPasswordInput, confirmPasswordInput, passwordMatchError);
+        }
+    });
+
+    newPasswordInput.addEventListener('input', () => {
+        if (confirmNewPasswordInput.value) {
+            validatePasswordMatch(newPasswordInput, confirmNewPasswordInput, newPasswordMatchError);
+        }
+    });
 
     // --- Отправка форм ---
 
@@ -255,41 +232,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = loginEmailInput.value.trim();
         const password = loginPasswordInput.value;
         clearFormErrors();
-      
+
         if (!email || !password) {
-          alert('Пожалуйста, заполните все поля');
-          return;
+            alert('Пожалуйста, заполните все поля');
+            return;
         }
-      
+
         showLoading(loginFormElement.querySelector('button[type="submit"]'));
-      
+
         try {
-          const response = await fetch('http://localhost:3000/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-          });
-          const data = await response.json();
-          if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
-      
-          // Сохраняем токен и данные пользователя
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('currentUser', JSON.stringify(data.user));
-      
-          alert('Вход выполнен успешно! (Перенаправление...)');
-          window.location.href = 'my-courses.html';
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка входа');
+
+            // Сохраняем данные пользователя в localStorage
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+            alert('Вход выполнен успешно! (Перенаправление...)');
+            window.location.href = 'my-courses.html';
         } catch (error) {
-          console.error('Ошибка входа:', error);
-          showError(
-            loginFormElement.querySelector('.error-message') || createErrorElement(loginFormElement),
-            error.message || 'Неверный email или пароль.'
-          );
-          loginEmailInput.classList.add('input-error');
-          loginPasswordInput.classList.add('input-error');
+            console.error('Ошибка входа:', error);
+            showError(
+                loginFormElement.querySelector('.error-message') || createErrorElement(loginFormElement),
+                error.message || 'Неверный email или пароль.'
+            );
+            loginEmailInput.classList.add('input-error');
+            loginPasswordInput.classList.add('input-error');
         } finally {
-          hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
+            hideLoading(loginFormElement.querySelector('button[type="submit"]'), 'Войти');
         }
-      });
+    });
 
     // Форма регистрации
     registerFormElement.addEventListener('submit', async (e) => {
@@ -300,66 +276,64 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = registerPasswordInput.value;
         const confirmPassword = confirmPasswordInput.value;
         clearFormErrors();
-      
+
         let hasError = false;
         if (!firstName) { registerFirstNameInput.classList.add('input-error'); hasError = true; }
         if (!lastName) { registerLastNameInput.classList.add('input-error'); hasError = true; }
         if (!validateEmail(email)) { registerEmailInput.classList.add('input-error'); hasError = true; }
         if (!password) { registerPasswordInput.classList.add('input-error'); hasError = true; }
         if (!confirmPassword) { registerPasswordInput.classList.add('input-error'); hasError = true; }
-      
+
         if (hasError) {
-          alert('Пожалуйста, заполните все обязательные поля корректно.');
-          return;
+            alert('Пожалуйста, заполните все обязательные поля корректно.');
+            return;
         }
         if (password !== confirmPassword) {
-          showError(passwordMatchError, 'Пароли не совпадают');
-          registerPasswordInput.classList.add('input-error');
-          confirmPasswordInput.classList.add('input-error');
-          return;
+            showError(passwordMatchError, 'Пароли не совпадают');
+            registerPasswordInput.classList.add('input-error');
+            confirmPasswordInput.classList.add('input-error');
+            return;
         }
         if (password.length < 6) {
-          showError(passwordMatchError, 'Пароль должен быть не менее 6 символов');
-          registerPasswordInput.classList.add('input-error');
-          confirmPasswordInput.classList.add('input-error');
-          return;
+            showError(passwordMatchError, 'Пароль должен быть не менее 6 символов');
+            registerPasswordInput.classList.add('input-error');
+            confirmPasswordInput.classList.add('input-error');
+            return;
         }
-      
+
         showLoading(registerFormElement.querySelector('button[type="submit"]'));
-      
+
         try {
-          const response = await fetch('http://localhost:3000/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName, email, password })
-          });
-          const data = await response.json();
-          if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
-      
-          // Сохраняем токен и данные пользователя
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('currentUser', JSON.stringify(data.user));
-      
-          alert('Регистрация прошла успешно! Теперь вы можете войти.');
-          switchToLoginBtn.click();
-          registerFormElement.reset();
+            const response = await fetch(`${API_BASE_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, password })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || 'Ошибка регистрации');
+
+            // Сохраняем данные пользователя в localStorage
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+            alert('Регистрация прошла успешно! Теперь вы можете войти.');
+            switchToLoginBtn.click();
+            registerFormElement.reset();
         } catch (error) {
-          console.error('Ошибка регистрации:', error);
-          showError(
-            registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement),
-            error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.'
-          );
-          if (error.message && error.message.toLowerCase().includes('email')) {
-            registerEmailInput.classList.add('input-error');
-          }
+            console.error('Ошибка регистрации:', error);
+            showError(
+                registerFormElement.querySelector('.error-message') || createErrorElement(registerFormElement),
+                error.message || 'Не удалось зарегистрироваться. Возможно, email уже используется.'
+            );
+            if (error.message && error.message.toLowerCase().includes('email')) {
+                registerEmailInput.classList.add('input-error');
+            }
         } finally {
-          hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
+            hideLoading(registerFormElement.querySelector('button[type="submit"]'), 'Зарегистрироваться');
         }
-      });
+    });
 
     // --- Вспомогательные функции ---
 
-    // Функция переключения видимости пароля (глобальная, так как вызывается из HTML onclick)
     window.togglePassword = function(inputId, button) {
         const input = document.getElementById(inputId);
         const icon = button.querySelector('i');
@@ -373,86 +347,77 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
+    };
+
+    function validatePasswordMatch(passwordInput, confirmInput, errorElement) {
+        const password = passwordInput.value;
+        const confirmPassword = confirmInput.value;
+
+        if (confirmPassword.length > 0 && password !== confirmPassword) {
+            confirmInput.classList.add('input-error');
+            passwordInput.classList.add('input-error');
+            showError(errorElement, 'Пароли не совпадают');
+        } else {
+            confirmInput.classList.remove('input-error');
+            passwordInput.classList.remove('input-error');
+            hideError(errorElement);
+        }
     }
 
-     // Валидация совпадения паролей
-    function validatePasswordMatch(passwordInput, confirmInput, errorElement) {
-         const password = passwordInput.value;
-         const confirmPassword = confirmInput.value;
-
-         if (confirmPassword.length > 0 && password !== confirmPassword) {
-             confirmInput.classList.add('input-error');
-             passwordInput.classList.add('input-error'); // Можно подсвечивать оба поля
-             showError(errorElement, 'Пароли не совпадают');
-         } else {
-             confirmInput.classList.remove('input-error');
-             passwordInput.classList.remove('input-error'); // Снимаем подсветку с обоих
-             hideError(errorElement);
-         }
-     }
-
-    // Простая валидация email
     function validateEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     }
 
-     // Показать/Скрыть сообщение об ошибке
-     function showError(element, message) {
-        if(element) {
+    function showError(element, message) {
+        if (element) {
             element.textContent = message;
             element.classList.remove('hidden');
         }
-     }
-     function hideError(element) {
-        if(element) {
+    }
+
+    function hideError(element) {
+        if (element) {
             element.textContent = '';
             element.classList.add('hidden');
         }
-     }
+    }
 
-     // Очистка всех ошибок и подсветки полей
     function clearFormErrors() {
         document.querySelectorAll('.error-message').forEach(el => hideError(el));
         document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     }
 
-    // Создание элемента для ошибки, если его нет
     function createErrorElement(formElement) {
         let errorDiv = formElement.querySelector('.form-general-error');
         if (!errorDiv) {
             errorDiv = document.createElement('p');
-            errorDiv.className = 'error-message form-general-error mt-2'; // Добавляем класс для идентификации
-            // Вставляем перед кнопкой отправки или в конец формы
+            errorDiv.className = 'error-message form-general-error mt-2';
             const submitButton = formElement.querySelector('button[type="submit"]');
             if (submitButton) {
-                 formElement.insertBefore(errorDiv, submitButton);
+                formElement.insertBefore(errorDiv, submitButton);
             } else {
-                 formElement.appendChild(errorDiv);
+                formElement.appendChild(errorDiv);
             }
         }
         return errorDiv;
     }
 
-    // Показать сообщение об успехе в модальном окне
-     function showSuccess(message) {
+    function showSuccess(message) {
         successText.textContent = message;
         successMessageDiv.classList.remove('hidden');
-        // Скрываем шаги, чтобы было видно только сообщение
         step1.classList.add('hidden');
         step2.classList.add('hidden');
         step3.classList.add('hidden');
-     }
+    }
 
-    // Индикаторы загрузки для кнопок
     function showLoading(buttonElement) {
         buttonElement.disabled = true;
-        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Загрузка...'; // Font Awesome спиннер
+        buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Загрузка...';
     }
 
     function hideLoading(buttonElement, originalText) {
-         buttonElement.disabled = false;
-         buttonElement.innerHTML = originalText;
-     }
-
-}); // Конец DOMContentLoaded
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = originalText;
+    }
+});

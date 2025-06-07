@@ -3,8 +3,8 @@ const { Pool } = require('pg');
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'education-platform',
-  password: '1111', // Укажи пароль, который ты задала при установке PostgreSQL
+  database: 'education_platform',
+  password: '...', // Укажи пароль, который ты задала при установке PostgreSQL
   port: 5432,
 });
 

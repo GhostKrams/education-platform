@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домашние задания | Образовательная платформа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #f97316;
+            transition: width 0.3s ease;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            color: white;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+        .homework-card {
+            transition: all 0.2s ease;
+        }
+        .homework-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .comment-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .comment-section.active {
+            max-height: 500px;
+        }
+        .grade-selector {
+            display: none;
+        }
+        .grade-selector.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Mobile menu button -->
+        <div class="md:hidden fixed top-4 left-4 z-50">
+            <button id="menuToggle" class="text-primary-500 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Overlay for mobile menu -->
+        <div id="overlay" class="overlay"></div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg">
+            <div class="p-4 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-primary-500">EduPlatform</h1>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-home mr-3 text-primary-400"></i>
+                            <span>Главная</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/courses" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-book mr-3 text-primary-400"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/homeworks" class="flex items-center p-3 rounded-lg bg-primary-100 text-primary-600">
+                            <i class="fas fa-tasks mr-3 text-primary-500"></i>
+                            <span>Домашние задания</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/materials" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-file-alt mr-3 text-primary-400"></i>
+                            <span>Материалы</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/feedback" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-comment-alt mr-3 text-primary-400"></i>
+                            <span>Обратная связь</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/support" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-question-circle mr-3 text-primary-400"></i>
+                            <span>Поддержка</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/profile" class="flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition">
+                            <i class="fas fa-user mr-3 text-primary-400"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-200 mt-auto">
+                <div class="flex items-center">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <p class="font-medium">Анна</p>
+                        <p class="text-sm text-gray-500">Студент</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Домашние задания</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notificationsBtn" class="text-gray-600 hover:text-primary-500 focus:outline-none relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="notification-badge">2</span>
+                            </button>
+                        </div>
+                        <div class="hidden md:block">
+                            <button id="userMenuBtn" class="flex items-center text-gray-600 hover:text-primary-500 focus:outline-none">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="w-8 h-8 rounded-full mr-2">
+                                <span class="font-medium">Анна</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Filter section -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div class="mb-4 md:mb-0">
+                            <h2 class="text-lg font-semibold text-gray-800">Фильтровать задания</h2>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative">
+                                <select id="courseFilter" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary-500">
+                                    <option value="all">Все курсы</option>
+                                    <option value="1">Годовой курс 2024–2025 — ОГЭ</option>
+                                    <option value="2">Курс по дробям</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <select id="statusFilter" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-primary-500">
+                                    <option value="all">Все статусы</option>
+                                    <option value="pending">Ожидает проверки</option>
+                                    <option value="checked">Проверено</option>
+                                    <option value="not_submitted">Не сдано</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <button id="applyFilters" class="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded transition">
+                                Применить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Homework assignments section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Домашние задания по курсу: ОГЭ</h2>
+                        <div class="flex items-center">
+                            <span class="text-sm text-gray-500 mr-2">Сортировка:</span>
+                            <select id="sortBy" class="bg-white border border-gray-300 text-gray-700 text-sm rounded focus:border-primary-500 focus:outline-none py-1 px-2">
+                                <option value="deadline">По сроку сдачи</option>
+                                <option value="course">По курсу</option>
+                                <option value="status">По статусу</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4" id="homeworkList">
+                        <!-- Homework 1 - Data from Homeworks and HomeworkSubmissions tables -->
+                        <div class="homework-card border border-gray-200 rounded-lg p-5 hover:border-primary-300 transition">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 p-2 rounded-lg mr-4">
+                                        <i class="fas fa-file-alt text-primary-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-800">Задание 1 — «Линейные уравнения»</h3>
+                                        <p class="text-sm text-gray-500 mt-1">Курс: Годовой курс 2024–2025 — ОГЭ</p>
+                                        <p class="text-sm text-gray-500">Срок сдачи: 01.05.2025</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full mb-2">Проверено</span>
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-700 mr-2">Оценка:</span>
+                                        <div class="flex items-center">
+                                            <span class="text-primary-500 font-medium">4/5</span>
+                                            <button class="ml-2 text-gray-400 hover:text-primary-500" id="editGradeBtn1">
+                                                <i class="fas fa-pencil-alt text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grade selector (admin only) -->
+                            <div class="grade-selector mt-3 ml-16" id="gradeSelector1">
+                                <div class="flex items-center">
+                                    <span class="text-sm font-medium text-gray-700 mr-2">Изменить оценку:</span>
+                                    <select class="border border-gray-300 rounded px-2 py-1 text-sm">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4" selected>4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                    <button class="ml-2 px-2 py-1 bg-primary-500 text-white text-sm rounded hover:bg-primary-600 transition">
+                                        Сохранить
+                                    </button>
+                                    <button class="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300 transition cancel-grade-edit">
+                                        Отмена
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Tutor feedback -->
+                            <div class="mt-4 ml-16">
+                                <div class="flex items-start">
+                                    <div class="bg-gray-100 p-3 rounded-lg w-full">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <span class="font-medium text-sm text-gray-700">Комментарий тьютора:</span>
+                                                <p class="text-sm text-gray-600 mt-1">"Хорошо, но проверь формулы в третьем задании. Также обрати внимание на оформление."</p>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <span class="text-xs text-gray-500">Иван Петров</span>
+                                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tutor" class="w-6 h-6 rounded-full ml-2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Student actions -->
+                            <div class="mt-4 ml-16 flex flex-wrap gap-3">
+                                <button class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition flex items-center">
+                                    <i class="fas fa-redo mr-2"></i> Повторно отправить
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Скачать задание
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center toggle-comments" data-target="comments1">
+                                    <i class="fas fa-comment-alt mr-2"></i> Комментарии (2)
+                                </button>
+                            </div>
+
+                            <!-- Comments section -->
+                            <div class="comment-section mt-4 ml-16" id="comments1">
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="space-y-3 mb-4">
+                                        <!-- Comment 1 -->
+                                        <div class="flex items-start">
+                                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                            <div class="bg-gray-50 p-3 rounded-lg flex-1">
+                                                <div class="flex justify-between items-start">
+                                                    <span class="font-medium text-sm">Анна Иванова</span>
+                                                    <span class="text-xs text-gray-500">2 дня назад</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600 mt-1">Спасибо за комментарий! Я исправила формулы, можете проверить повторно?</p>
+                                            </div>
+                                        </div>
+                                        <!-- Comment 2 -->
+                                        <div class="flex items-start">
+                                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tutor" class="w-8 h-8 rounded-full mr-3">
+                                            <div class="bg-primary-50 p-3 rounded-lg flex-1">
+                                                <div class="flex justify-between items-start">
+                                                    <span class="font-medium text-sm">Иван Петров</span>
+                                                    <span class="text-xs text-gray-500">1 день назад</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600 mt-1">Да, я посмотрю ваши исправления в течение дня.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Add comment form -->
+                                    <div class="flex items-start">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                        <div class="flex-1">
+                                            <textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:border-primary-500 focus:outline-none" placeholder="Написать комментарий..."></textarea>
+                                            <div class="flex justify-end mt-2">
+                                                <button class="px-4 py-2 bg-primary-500 text-white text-sm rounded hover:bg-primary-600 transition">
+                                                    Отправить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Homework 2 - Data from Homeworks and HomeworkSubmissions tables -->
+                        <div class="homework-card border border-gray-200 rounded-lg p-5 hover:border-primary-300 transition">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 p-2 rounded-lg mr-4">
+                                        <i class="fas fa-file-alt text-primary-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-800">Задание 2 — «Квадратные уравнения»</h3>
+                                        <p class="text-sm text-gray-500 mt-1">Курс: Годовой курс 2024–2025 — ОГЭ</p>
+                                        <p class="text-sm text-gray-500">Срок сдачи: 15.05.2025</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full mb-2">Ожидает проверки</span>
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-700 mr-2">Оценка:</span>
+                                        <span class="text-gray-500">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Admin actions -->
+                            <div class="mt-4 ml-16 flex flex-wrap gap-3">
+                                <button class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition flex items-center">
+                                    <i class="fas fa-check mr-2"></i> Принять
+                                </button>
+                                <button class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition flex items-center">
+                                    <i class="fas fa-times mr-2"></i> Отклонить
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Скачать задание
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center toggle-comments" data-target="comments2">
+                                    <i class="fas fa-comment-alt mr-2"></i> Комментарии (0)
+                                </button>
+                            </div>
+
+                            <!-- Comments section -->
+                            <div class="comment-section mt-4 ml-16" id="comments2">
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="space-y-3 mb-4">
+                                        <!-- No comments yet -->
+                                        <div class="text-center py-4 text-gray-500">
+                                            Комментариев пока нет
+                                        </div>
+                                    </div>
+                                    <!-- Add comment form -->
+                                    <div class="flex items-start">
+                                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tutor" class="w-8 h-8 rounded-full mr-3">
+                                        <div class="flex-1">
+                                            <textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:border-primary-500 focus:outline-none" placeholder="Написать комментарий..."></textarea>
+                                            <div class="flex justify-end mt-2">
+                                                <button class="px-4 py-2 bg-primary-500 text-white text-sm rounded hover:bg-primary-600 transition">
+                                                    Отправить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Homework 3 - Data from Homeworks and HomeworkSubmissions tables -->
+                        <div class="homework-card border border-gray-200 rounded-lg p-5 hover:border-primary-300 transition">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-start">
+                                    <div class="bg-primary-100 p-2 rounded-lg mr-4">
+                                        <i class="fas fa-file-alt text-primary-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-lg text-gray-800">Задание 3 — «Геометрические задачи»</h3>
+                                        <p class="text-sm text-gray-500 mt-1">Курс: Годовой курс 2024–2025 — ОГЭ</p>
+                                        <p class="text-sm text-gray-500">Срок сдачи: 25.05.2025</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full mb-2">Не сдано</span>
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-700 mr-2">Оценка:</span>
+                                        <span class="text-gray-500">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Student actions -->
+                            <div class="mt-4 ml-16 flex flex-wrap gap-3">
+                                <button class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition flex items-center">
+                                    <i class="fas fa-upload mr-2"></i> Загрузить работу
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Скачать задание
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition flex items-center toggle-comments" data-target="comments3">
+                                    <i class="fas fa-comment-alt mr-2"></i> Комментарии (1)
+                                </button>
+                            </div>
+
+                            <!-- Comments section -->
+                            <div class="comment-section mt-4 ml-16" id="comments3">
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="space-y-3 mb-4">
+                                        <!-- Comment 1 -->
+                                        <div class="flex items-start">
+                                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tutor" class="w-8 h-8 rounded-full mr-3">
+                                            <div class="bg-primary-50 p-3 rounded-lg flex-1">
+                                                <div class="flex justify-between items-start">
+                                                    <span class="font-medium text-sm">Иван Петров</span>
+                                                    <span class="text-xs text-gray-500">3 дня назад</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600 mt-1">Не забудьте сдать это задание до указанного срока. Если будут вопросы, пишите!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Add comment form -->
+                                    <div class="flex items-start">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full mr-3">
+                                        <div class="flex-1">
+                                            <textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:border-primary-500 focus:outline-none" placeholder="Написать комментарий..."></textarea>
+                                            <div class="flex justify-end mt-2">
+                                                <button class="px-4 py-2 bg-primary-500 text-white text-sm rounded hover:bg-primary-600 transition">
+                                                    Отправить
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-8 flex justify-center">
+                        <nav class="inline-flex rounded-md shadow">
+                            <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-primary-500 font-medium">1</a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
+                            <a href="#" class="px-3 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
+                            <a href="#" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Notifications dropdown -->
+    <div id="notificationsDropdown" class="hidden fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold">Уведомления</h3>
+                <button class="text-sm text-primary-500">Очистить все</button>
+            </div>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Домашнее задание проверено</p>
+                        <p class="text-xs text-gray-600 mt-1">2 часа назад</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Новый урок по теме "Формулы"</p>
+                        <p class="text-xs text-gray-600 mt-1">Вчера, 15:30</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 hover:bg-gray-50">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 text-gray-400 mr-3 mt-1">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-sm">Напоминание: тестирование</p>
+                        <p class="text-xs text-gray-600 mt-1">Понедельник, 10:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 border-t border-gray-200 text-center">
+            <a href="/notifications" class="text-sm text-primary-500 font-medium">Показать все уведомления</a>
+        </div>
+    </div>
+
+    <!-- User menu dropdown -->
+    <div id="userMenuDropdown" class="hidden fixed right-4 top-16 w-56 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+        <div class="p-2">
+            <a href="/profile" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Мой профиль</a>
+            <a href="/settings" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Настройки</a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a href="/logout" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded">Выйти</a>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Notifications dropdown
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const notificationsDropdown = document.getElementById('notificationsDropdown');
+
+        notificationsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationsDropdown.classList.toggle('hidden');
+            userMenuDropdown.classList.add('hidden');
+        });
+
+        // User menu dropdown
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+        if (userMenuBtn) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenuDropdown.classList.toggle('hidden');
+                notificationsDropdown.classList.add('hidden');
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notificationsDropdown.contains(e.target) && e.target !== notificationsBtn) {
+                notificationsDropdown.classList.add('hidden');
+            }
+            if (!userMenuDropdown.contains(e.target) && e.target !== userMenuBtn) {
+                userMenuDropdown.classList.add('hidden');
+            }
+        });
+
+        // Close dropdowns on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                notificationsDropdown.classList.add('hidden');
+                userMenuDropdown.classList.add('hidden');
+            }
+        });
+
+        // Toggle comments sections
+        document.querySelectorAll('.toggle-comments').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const commentsSection = document.getElementById(targetId);
+                commentsSection.classList.toggle('active');
+                
+                // Update icon
+                const icon = this.querySelector('i');
+                if (commentsSection.classList.contains('active')) {
+                    icon.classList.remove('fa-comment-alt');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-comment-alt');
+                }
+            });
+        });
+
+        // Grade editing (admin functionality)
+        document.getElementById('editGradeBtn1').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('gradeSelector1').classList.toggle('active');
+        });
+
+        // Cancel grade editing
+        document.querySelectorAll('.cancel-grade-edit').forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.grade-selector').classList.remove('active');
+            });
+        });
+
+        // Filter functionality
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const courseFilter = document.getElementById('courseFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            // In a real app, this would make an API call to filter homeworks
+            console.log('Applying filters:', {
+                course: courseFilter,
+                status: statusFilter
+            });
+            
+            // Show loading state
+            const homeworkList = document.getElementById('homeworkList');
+            homeworkList.innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-primary-500 text-2xl"></i><p class="mt-2 text-gray-500">Загрузка заданий...</p></div>';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // This would be replaced with actual filtered data from the backend
+                alert('Фильтры применены. В реальном приложении здесь будет загрузка данных с сервера.');
+                // You would then update the homeworkList with the filtered results
+            }, 1000);
+        });
+
+        // Sort functionality
+        document.getElementById('sortBy').addEventListener('change', function() {
+            const sortValue = this.value;
+            console.log('Sorting by:', sortValue);
+            
+            // In a real app, this would make an API call to sort homeworks
+            // For demo, we'll just show a message
+            alert(`Сортировка по ${sortValue}. В реальном приложении здесь будет загрузка отсортированных данных с сервера.`);
+        });
+
+        // Simulate data loading from database
+        document.addEventListener('DOMContentLoaded', function() {
+            // In a real app, you would fetch this data from your backend
+            console.log('Loading homework data from database...');
+            
+            // Example of how you might structure data fetching:
+            /*
+            fetch('/api/user/homeworks')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the UI with the fetched homework data
+                    console.log('Homework data:', data);
+                });
+            */
+        });
+    </script>
+</body>
+</html>

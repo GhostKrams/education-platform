@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // --- DOM Element Selectors ---
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const notificationsBtn = document.getElementById('notificationsBtn');
     const notificationsDropdown = document.getElementById('notificationsDropdown');
-    const notificationsListEl = document.getElementById('notificationsList'); // Переименовано для ясности
+    const notificationsListEl = document.getElementById('notificationsList');
     const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
     const notificationCountBadge = document.getElementById('notificationCount');
 
@@ -43,9 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const testsLoadingMsg = document.getElementById('testsLoadingMsg');
 
     // --- State ---
-    let currentUser = null; 
+    let currentUser = null;
     let userNotifications = [];
-    const API_BASE_URL = '/api'; // Ваш базовый URL для API
+    const API_BASE_URL = 'http://localhost:3000/api';
 
     // --- Mobile Menu Toggle ---
     if (menuToggle && sidebar && overlay) {
@@ -66,13 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const isHidden = dropdown.classList.contains('hidden');
-                // Сначала скрыть все дропдауны (включая текущий, если он был открыт)
                 document.querySelectorAll('.fixed.z-\\[1060\\]').forEach(d => d.classList.add('hidden'));
-                // Если текущий был скрыт, показать его
                 if (isHidden) {
                     dropdown.classList.remove('hidden');
                 }
-                // Скрыть остальные специфичные дропдауны
                 otherDropdowns.forEach(d => d.classList.add('hidden'));
             });
         }
@@ -80,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     toggleDropdown(notificationsBtn, notificationsDropdown, [userMenuDropdown]);
     if (userMenuBtn) {
-       toggleDropdown(userMenuBtn, userMenuDropdown, [notificationsDropdown]);
+        toggleDropdown(userMenuBtn, userMenuDropdown, [notificationsDropdown]);
     }
 
     document.addEventListener('click', (e) => {
@@ -112,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modalElement) {
             modalElement.classList.remove('active');
             document.body.style.overflow = '';
-            if (courseFormError) courseFormError.classList.add('hidden'); // Скрыть ошибку формы
+            if (courseFormError) courseFormError.classList.add('hidden');
         }
     }
 
@@ -136,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // --- Course Form Submission ---
     if (courseForm) {
         courseForm.addEventListener('submit', async (e) => {
@@ -145,25 +142,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const courseData = {
                 title: formData.get('title'),
                 description: formData.get('description'),
-                startDate: formData.get('startDate') || null, // Отправить null если пусто
-                endDate: formData.get('endDate') || null,     // Отправить null если пусто
-                // teacherId: formData.get('teacherId') || currentUser.userId // Пример, если преподаватель текущий пользователь
+                startDate: formData.get('startDate') || null,
+                endDate: formData.get('endDate') || null,
+                teacherId: currentUser.userId
             };
-            
+
             console.log('Данные для создания курса:', courseData);
             if (courseFormError) courseFormError.classList.add('hidden');
 
             try {
-                const token = localStorage.getItem('authToken');
-                if (!token) throw new Error('Пользователь не авторизован');
-
-                // Предполагаем, что TeacherID будет добавлен на бэкенде на основе текущего пользователя, если он Teacher
-                // Или, если это Admin, он может указать TeacherID в форме (поле нужно будет добавить)
-                const response = await fetch(`${API_BASE_URL}/courses`, { 
+                const response = await fetch(`${API_BASE_URL}/courses`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(courseData)
                 });
@@ -171,9 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Не удалось создать курс');
                 }
-                // const newCourse = await response.json();
                 showNotificationPopup('Курс успешно создан!', 'success');
-                loadUserCourses(); 
+                loadUserCourses();
                 closeModal(addCourseModal);
                 courseForm.reset();
             } catch (error) {
@@ -203,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'error') {
             bgColor = 'bg-red-100'; textColor = 'text-red-800'; iconClass = 'fas fa-exclamation-circle';
         }
-        
+
         popup.id = popupId;
         popup.className = `${bgColor} ${textColor} p-3 shadow-md flex justify-between items-center mb-2 rounded-md pointer-events-auto`;
         popup.innerHTML = `
@@ -231,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Notifications Dropdown ---
     function renderNotifications() {
         if (!notificationsListEl || !notificationCountBadge) return;
-        notificationsListEl.innerHTML = ''; 
+        notificationsListEl.innerHTML = '';
 
         if (userNotifications.length === 0) {
             notificationsListEl.innerHTML = '<p class="p-4 text-sm text-gray-500">Нет новых уведомлений.</p>';
@@ -246,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
         userNotifications.forEach(notif => {
             const item = document.createElement('div');
             item.className = 'p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer';
-            // Используйте реальные данные уведомления
             item.innerHTML = `
                 <div class="flex items-start">
                     <div class="flex-shrink-0 text-primary-500 mr-3 mt-1">
@@ -260,8 +249,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             item.addEventListener('click', () => {
                 console.log('Notification clicked:', notif);
-                // TODO: Действие при клике на уведомление
-                // markNotificationAsRead(notif.id); 
                 notificationsDropdown.classList.add('hidden');
             });
             notificationsListEl.appendChild(item);
@@ -271,9 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearNotificationsBtn) {
         clearNotificationsBtn.addEventListener('click', async () => {
             try {
-                // TODO: Логика очистки уведомлений на бэкенде
-                // const token = localStorage.getItem('authToken');
-                // await fetch(`${API_BASE_URL}/notifications/clear-all`, { method: 'POST', headers: {'Authorization':`Bearer ${token}`} });
                 userNotifications = [];
                 renderNotifications();
                 showNotificationPopup('Все уведомления очищены.');
@@ -287,7 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            localStorage.removeItem('authToken'); 
             localStorage.removeItem('currentUser');
             showNotificationPopup('Выход из системы...', 'info');
             setTimeout(() => {
@@ -299,123 +282,111 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Dynamic Data Loading ---
     function updateUserDataUI(userData) {
         if (!userData) {
-            // Если нет данных о пользователе (например, не авторизован), редирект на страницу входа
-            localStorage.removeItem('authToken');
             localStorage.removeItem('currentUser');
             window.location.href = 'auth.html';
             return;
         }
-        currentUser = userData; // Обновляем глобальную переменную
-        const defaultAvatar = 'assets/images/default-avatar.png'; 
+        currentUser = userData;
+        const defaultAvatar = 'assets/images/default-avatar.png';
 
-        if(sidebarUserName) sidebarUserName.textContent = userData.fullname || 'Пользователь';
-        if(sidebarUserRole) sidebarUserRole.textContent = userData.role || 'Статус';
-        if(sidebarUserAvatar) sidebarUserAvatar.src = userData.avatarUrl || defaultAvatar;
-        
-        if(headerUserName) headerUserName.textContent = userData.fullname || 'Пользователь';
-        if(headerUserAvatar) headerUserAvatar.src = userData.avatarUrl || defaultAvatar;
+        if (sidebarUserName) sidebarUserName.textContent = userData.fullname || 'Пользователь';
+        if (sidebarUserRole) sidebarUserRole.textContent = userData.role || 'Статус';
+        if (sidebarUserAvatar) sidebarUserAvatar.src = userData.avatarUrl || defaultAvatar;
 
-        // Показать/скрыть кнопку "Добавить курс" в зависимости от роли
-        if(addCourseBtn && (userData.role === 'Teacher' || userData.role === 'Admin')) {
+        if (headerUserName) headerUserName.textContent = userData.fullname || 'Пользователь';
+        if (headerUserAvatar) headerUserAvatar.src = userData.avatarUrl || defaultAvatar;
+
+        if (addCourseBtn && (userData.role === 'Teacher' || userData.role === 'Admin')) {
             addCourseBtn.classList.remove('hidden');
         } else if (addCourseBtn) {
             addCourseBtn.classList.add('hidden');
         }
     }
-    
-    async function fetchWithAuth(url, options = {}) {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            console.log("Нет токена, перенаправление на вход.");
+
+    function initializeUserData() {
+        const cachedUser = localStorage.getItem('currentUser');
+        if (!cachedUser) {
+            console.log('currentUser отсутствует в localStorage, перенаправление на auth.html');
             window.location.href = 'auth.html';
-            throw new Error('Пользователь не авторизован');
+            return;
         }
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            ...options.headers,
-        };
-
-        const response = await fetch(url, { ...options, headers });
-
-        if (response.status === 401 || response.status === 403) { // Не авторизован или доступ запрещен
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
-            console.log("Ошибка авторизации, перенаправление на вход.");
-            window.location.href = 'auth.html';
-            throw new Error('Ошибка авторизации');
-        }
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
-            throw new Error(errorData.message || 'Ошибка сети');
-        }
-        return response.json();
-    }
-
-    async function fetchUserData() {
-        try {
-            // Пытаемся получить данные из localStorage сначала для быстрого отображения
-            const cachedUser = localStorage.getItem('currentUser');
-            if (cachedUser) {
-                updateUserDataUI(JSON.parse(cachedUser));
-            }
-
-            const data = await fetchWithAuth(`${API_BASE_URL}/users/me`); // Новый эндпоинт для /users/me
-            localStorage.setItem('currentUser', JSON.stringify(data.user)); // Сохраняем актуальные данные
-            updateUserDataUI(data.user);
-        } catch (error) {
-            console.error("Не удалось загрузить данные пользователя:", error.message);
-            // Редирект уже обработан в fetchWithAuth или updateUserDataUI
-        }
+        const userData = JSON.parse(cachedUser);
+        console.log('Инициализация currentUser:', userData);
+        updateUserDataUI(userData);
     }
 
     async function loadUserCourses() {
-        if (!activeCoursesListEl) return;
+        if (!activeCoursesListEl) {
+            console.log('activeCoursesListEl не найден в DOM');
+            return;
+        }
         if (coursesLoadingMsg) coursesLoadingMsg.textContent = 'Загрузка активных курсов...';
         activeCoursesListEl.innerHTML = '';
-      
+
         try {
-          const data = await fetchWithAuth(`${API_BASE_URL}/courses?enrolled=true`);
-          const courses = data.courses || data;
-      
-          if (coursesLoadingMsg) coursesLoadingMsg.classList.add('hidden');
-      
-          if (!courses || courses.length === 0) {
-            activeCoursesListEl.innerHTML = '<p class="text-gray-500">У вас пока нет активных курсов.</p>';
-            return;
-          }
-          courses.forEach(course => {
-            const courseEl = document.createElement('div');
-            courseEl.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-md transition';
-            const progress = course.progress || 0;
-            const lessonsCompleted = course.lessons_completed || 0;
-            const totalLessons = course.total_lessons || 1;
-            const timeLeft = course.time_left || 'Не указано';
-      
-            courseEl.innerHTML = `
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="font-semibold text-lg text-gray-800">${course.title}</h3>
-                <span class="text-primary-500 font-medium">${progress}%</span>
-              </div>
-              <div class="progress-bar mb-2">
-                <div class="progress-fill" style="width: ${progress}%"></div>
-              </div>
-              <div class="flex justify-between text-sm text-gray-500">
-                <span>${lessonsCompleted} из ${totalLessons} уроков</span>
-                <span>До конца: ${timeLeft}</span>
-              </div>
-              <div class="mt-3 flex space-x-2">
-                <a href="course-detail.html?id=${course.courseid}" class="px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600 transition">
-                  Продолжить
-                </a>
-              </div>`;
-            activeCoursesListEl.appendChild(courseEl);
-          });
+            const userEmail = currentUser.email;
+            console.log('Отправка запроса для email:', userEmail);
+            const response = await fetch(`${API_BASE_URL}/courses?email=${encodeURIComponent(userEmail)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            console.log('Полученные данные от сервера:', data);
+            if (!response.ok) {
+                throw new Error(data.message || 'Ошибка загрузки курсов');
+            }
+
+            const courses = data.courses || [];
+            console.log('Извлечённые курсы:', courses);
+
+            if (coursesLoadingMsg) coursesLoadingMsg.classList.add('hidden');
+
+            if (courses.length === 0) {
+                activeCoursesListEl.innerHTML = '<p class="text-gray-500">У вас пока нет активных курсов.</p>';
+                return;
+            }
+
+            courses.forEach(course => {
+                const courseEl = document.createElement('div');
+                // Добавляем inline-стили для видимости
+                courseEl.style.border = '1px solid #e5e7eb';
+                courseEl.style.borderRadius = '0.5rem';
+                courseEl.style.padding = '1rem';
+                courseEl.style.marginBottom = '1rem';
+                courseEl.style.backgroundColor = '#ffffff';
+                courseEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+                courseEl.style.transition = 'box-shadow 0.3s ease';
+
+                const progress = course.progress || 0;
+                const lessonsCompleted = course.lessons_completed || 0;
+                const totalLessons = course.total_lessons || 1;
+                const timeLeft = course.time_left || 'Не указано';
+
+                courseEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937;">${course.title}</h3>
+                        <span style="color: #f97316; font-weight: 500;">${progress}%</span>
+                    </div>
+                    <div style="height: 8px; border-radius: 4px; background-color: #e5e7eb; overflow: hidden; margin-bottom: 0.5rem;">
+                        <div style="height: 100%; border-radius: 4px; background-color: #f97316; width: ${progress}%; transition: width 0.3s ease;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #6b7280;">
+                        <span>${lessonsCompleted} из ${totalLessons} уроков</span>
+                        <span>До конца: ${timeLeft}</span>
+                    </div>
+                    <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
+                        <a href="course-detail.html?courseId=${course.courseid}" style="padding: 0.25rem 0.75rem; background-color: #f97316; color: white; border-radius: 0.375rem; font-size: 0.875rem; text-decoration: none; transition: background-color 0.3s ease;">
+                            Продолжить
+                        </a>
+                    </div>`;
+                activeCoursesListEl.appendChild(courseEl);
+                console.log('Добавлен курс в DOM:', course.title);
+            });
         } catch (error) {
-          console.error('Ошибка загрузки курсов:', error);
-          if (coursesLoadingMsg) coursesLoadingMsg.classList.add('hidden');
-          activeCoursesListEl.innerHTML = '<p class="text-red-500">Не удалось загрузить курсы. Попробуйте позже.</p>';
+            console.error('Ошибка загрузки курсов:', error);
+            if (coursesLoadingMsg) coursesLoadingMsg.classList.add('hidden');
+            activeCoursesListEl.innerHTML = '<p class="text-red-500">Не удалось загрузить курсы. Попробуйте позже.</p>';
         }
     }
 
@@ -423,45 +394,39 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!answersFeedListEl) return;
         if (answersLoadingMsg) answersLoadingMsg.textContent = 'Загрузка ленты ответов...';
         answersFeedListEl.innerHTML = '';
-        // TODO: Загрузить ленту ответов
-        // Пример заглушки:
         setTimeout(() => {
-             if (answersLoadingMsg) answersLoadingMsg.classList.add('hidden');
+            if (answersLoadingMsg) answersLoadingMsg.classList.add('hidden');
             answersFeedListEl.innerHTML = '<p class="text-gray-500">Лента ответов пока пуста.</p>';
         }, 1500);
         console.log("Загрузка ленты ответов...");
     }
+
     async function loadSchedule() {
-         if (!scheduleListEl) return;
+        if (!scheduleListEl) return;
         if (scheduleLoadingMsg) scheduleLoadingMsg.textContent = 'Загрузка расписания...';
         scheduleListEl.innerHTML = '';
-        // TODO: Загрузить расписание
-        // Пример заглушки:
         setTimeout(() => {
             if (scheduleLoadingMsg) scheduleLoadingMsg.classList.add('hidden');
             scheduleListEl.innerHTML = '<p class="text-gray-500">В ближайшее время занятий нет.</p>';
         }, 1500);
         console.log("Загрузка расписания...");
     }
+
     async function loadUpcomingTests() {
         if (!upcomingTestsListEl) return;
         if (testsLoadingMsg) testsLoadingMsg.textContent = 'Загрузка ближайших тестов...';
         upcomingTestsListEl.innerHTML = '';
-        // TODO: Загрузить ближайшие тесты
-        // Пример заглушки:
         setTimeout(() => {
             if (testsLoadingMsg) testsLoadingMsg.classList.add('hidden');
             upcomingTestsListEl.innerHTML = '<p class="text-gray-500">Ближайших тестов не запланировано.</p>';
         }, 1500);
         console.log("Загрузка ближайших тестов...");
     }
-     async function loadNotifications() {
+
+    async function loadNotifications() {
         if (!notificationsListEl) return;
         notificationsListEl.innerHTML = '<p class="p-4 text-sm text-gray-500">Загрузка уведомлений...</p>';
         try {
-            // const data = await fetchWithAuth(`${API_BASE_URL}/notifications`);
-            // userNotifications = data.notifications || data;
-            // Заглушка:
             userNotifications = [
                 { id: 1, message: "Проверка ДЗ по 'Основам Алгебры'", timeAgo: "15 минут назад", icon: "fa-check-circle", link: "#" },
                 { id: 2, message: "Новый материал: 'Интегралы'", timeAgo: "2 часа назад", icon: "fa-book-open", link: "#" },
@@ -475,8 +440,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Initial Data Load ---
     async function initializeDashboard() {
-        await fetchUserData(); 
-        if (currentUser) { 
+        initializeUserData();
+        if (currentUser) {
             loadUserCourses();
             loadAnswersFeed();
             loadSchedule();
@@ -486,5 +451,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     initializeDashboard();
-
 });
