@@ -20,11 +20,14 @@ const authRoutes = require('./routes/auth');
 const courseRoutes = require('./routes/courses');
 const courseDetailRoutes = require('./routes/courseDetail');
 const lessonRoutes = require('./routes/lesson');
+const answersFeedRoutes = require('./routes/answersFeed');
+
 app.use('/api/auth', authRoutes); // Префикс /api/auth для маршрутов авторизации
 app.use('/api/courses', courseRoutes); // Префикс /api/courses для маршрутов курсов
 console.log('courseDetailRoutes loaded:', courseDetailRoutes);
 app.use('/api/course-detail', courseDetailRoutes);
 app.use('/api/lesson', lessonRoutes);
+app.use('/api/answersFeed', answersFeedRoutes); 
 
 // Обработка маршрута для корневой страницы (auth.html)
 app.get('/', (req, res) => {
@@ -44,6 +47,11 @@ app.get('/course-detail.html', (req, res) => {
 // Обработка маршрута для страницы lesson.html
 app.get('/lesson.html', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend', 'lesson.html'));
+});
+
+// Обработка маршрута для страницы answers-feed.html
+app.get('/answers-feed.html', (req, res) => { // <--- ДОБАВИТЬ
+    res.sendFile(path.join(__dirname, '../frontend', 'answers-feed.html'));
 });
 
 // Обработка несуществующих маршрутов (404)

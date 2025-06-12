@@ -1,0 +1,1235 @@
+lesson.html:
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок | Образовательная платформа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css"> <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { // Оранжевая тема, как в других файлах
+                            50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74',
+                            400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c',
+                            800: '#9a3412', 900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <div class="md:hidden fixed top-4 left-4 z-[1051]">
+            <button id="menuToggle" class="text-primary-500 focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="overlay" class="overlay"></div>
+
+        <aside id="sidebar" class="sidebar w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg">
+            <div class="p-4 border-b border-gray-200">
+                <a href="index.html" class="text-2xl font-bold text-primary-500">EduPlatform</a>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="my-courses.html" class="nav-link flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition" data-page="my-courses">
+                            <i class="fas fa-book mr-3 text-primary-400"></i>
+                            <span>Мои курсы</span>
+                        </a>
+                    </li>
+                     <li>
+                        <a href="#" class="nav-link flex items-center p-3 rounded-lg bg-primary-100 text-primary-600" data-page="lesson"> <i class="fas fa-chalkboard-teacher mr-3 text-primary-500"></i>
+                            <span>Текущий урок</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="answers-feed.html" class="nav-link flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition" data-page="answers-feed">
+                            <i class="fas fa-stream mr-3 text-primary-400"></i>
+                            <span>Лента ответов</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="testing.html" class="nav-link flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition" data-page="testing">
+                            <i class="fas fa-clipboard-check mr-3 text-primary-400"></i>
+                            <span>Тестирование</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="schedule.html" class="nav-link flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition" data-page="schedule">
+                            <i class="fas fa-calendar-alt mr-3 text-primary-400"></i>
+                            <span>Расписание</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="profile.html" class="nav-link flex items-center p-3 rounded-lg hover:bg-primary-50 text-gray-700 hover:text-primary-600 transition" data-page="profile">
+                            <i class="fas fa-user mr-3 text-primary-400"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t border-gray-200 mt-auto">
+                <div class="flex items-center">
+                    <img src="assets/images/default-avatar.png" alt="Profile" id="sidebarUserAvatar" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <p class="font-medium" id="sidebarUserName">Пользователь</p>
+                        <p class="text-sm text-gray-500" id="sidebarUserRole">Статус</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 overflow-auto">
+            <div id="notificationPopupContainer" class="fixed top-4 right-4 z-[1100] w-full max-w-sm pointer-events-none"></div>
+
+            <header class="bg-white shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <a href="my-courses.html" id="backToCourseLink" class="text-primary-500 hover:text-primary-700" aria-label="Назад к курсу">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 id="courseTitleHeader" class="text-xl md:text-2xl font-bold text-gray-800">Загрузка...</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notificationsBtn" class="text-gray-600 hover:text-primary-500 focus:outline-none relative">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="notification-badge hidden" id="notificationCountBadge">0</span>
+                            </button>
+                        </div>
+                        <div class="hidden md:block">
+                            <button id="userMenuBtn" class="flex items-center text-gray-600 hover:text-primary-500 focus:outline-none">
+                                <img src="assets/images/default-avatar.png" alt="Profile" id="headerUserAvatar" class="w-8 h-8 rounded-full mr-2">
+                                <span class="font-medium" id="headerUserName">Пользователь</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-4 md:p-6">
+                <div id="adminControls" class="flex justify-end mb-4 hidden">
+                    <button id="editLessonBtn" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition flex items-center">
+                        <i class="fas fa-edit mr-2"></i> Редактировать урок
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 id="lessonTitleDisplay" class="text-2xl font-bold text-gray-800 mb-2">Загрузка названия урока...</h2>
+                    <p id="lessonDateDisplay" class="text-gray-600">Дата урока...</p>
+                </div>
+
+                <div id="lessonVideoContainer" class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                    <div class="aspect-w-16 aspect-h-9"> <iframe id="lessonVideoEmbed" src="" class="w-full h-64 md:h-96" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+                
+                <div id="homeworkTaskSection" class="bg-white rounded-lg shadow p-6 mb-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">Домашнее задание</h3>
+                    <p id="homeworkTaskText" class="text-gray-700 whitespace-pre-wrap">Загрузка текста задания...</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Материалы к уроку</h3>
+                        <span id="materialsCount" class="text-sm text-gray-500">0 файлов</span>
+                    </div>
+                    <div id="materialsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <p id="materialsLoadingMsg" class="text-gray-500 col-span-full">Загрузка материалов...</p>
+                        </div>
+                </div>
+
+                <div id="homeworkSubmissionSection" class="bg-white rounded-lg shadow p-6 mb-6 hidden">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Отправить домашнее задание</h3>
+                    <form id="homeworkSubmissionForm" class="space-y-4">
+                        <div>
+                            <label for="homeworkFile" class="block text-sm font-medium text-gray-700 mb-1">Файл с заданием</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <div class="mx-auto h-12 w-12 text-gray-400">
+                                         <i class="fas fa-file-upload fa-3x"></i>
+                                    </div>
+                                    <div class="flex text-sm text-gray-600 justify-center">
+                                        <label for="homeworkFile" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-500 hover:text-primary-400 focus-within:outline-none">
+                                            <span id="homeworkFileLabel">Загрузить файл</span>
+                                            <input id="homeworkFile" name="homeworkFile" type="file" class="sr-only" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.zip,.rar,.ppt,.pptx,.xls,.xlsx">
+                                        </label>
+                                        <p class="pl-1">или перетащите сюда</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Макс. размер: 25MB</p>
+                                </div>
+                            </div>
+                            <div id="homeworkFileNameDisplay" class="mt-2 text-sm text-gray-600"></div>
+                        </div>
+                        <div>
+                            <label for="homeworkComment" class="block text-sm font-medium text-gray-700 mb-1">Комментарий (необязательно)</label>
+                            <textarea id="homeworkComment" name="homeworkComment" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Ваши комментарии к заданию..."></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" id="submitHomeworkBtn" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">
+                                Отправить задание
+                            </button>
+                        </div>
+                        <p id="homeworkFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Комментарии к уроку</h3>
+                        <button id="addCommentBtn" class="px-3 py-1 bg-primary-500 text-white rounded-md text-sm hover:bg-primary-600 transition">
+                            <i class="fas fa-plus mr-1"></i> Добавить комментарий
+                        </button>
+                    </div>
+                    <div id="addCommentFormContainer" class="mt-4 hidden">
+                        <form id="addCommentForm" class="space-y-3">
+                            <div>
+                                <label for="commentText" class="block text-sm font-medium text-gray-700 mb-1">Ваш комментарий</label>
+                                <textarea id="commentText" name="commentText" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Напишите ваш комментарий..." required></textarea>
+                            </div>
+                            <div class="flex justify-end space-x-2">
+                                <button type="button" id="cancelCommentBtn" class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">Отмена</button>
+                                <button type="submit" class="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">Отправить</button>
+                            </div>
+                            <p id="commentFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+                        </form>
+                    </div>
+                    <div id="commentsList" class="space-y-4 mt-4">
+                        <p id="commentsLoadingMsg" class="text-gray-500">Загрузка комментариев...</p>
+                        </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="editLessonModal" class="modal"> <div class="modal-content p-6"> <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Редактировать урок</h3>
+                <button id="closeEditLessonModalBtn" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="editLessonForm" class="space-y-4">
+                <div>
+                    <label for="editLessonTitle" class="block text-sm font-medium text-gray-700 mb-1">Название урока</label>
+                    <input type="text" id="editLessonTitle" name="title" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" required>
+                </div>
+                <div>
+                    <label for="editLessonVideoUrl" class="block text-sm font-medium text-gray-700 mb-1">Ссылка на видео урока (Rutube, YouTube и др.)</label>
+                    <input type="url" id="editLessonVideoUrl" name="videoUrl" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="https://example.com/video">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Прикрепленные материалы</label>
+                    <div id="currentMaterialsEditList" class="space-y-2 mb-2 max-h-40 overflow-y-auto p-2 border rounded-md">
+                        </div>
+                    <label for="editNewLessonMaterials" class="block text-sm font-medium text-gray-700 mb-1">Добавить новые материалы</label>
+                    <input type="file" id="editNewLessonMaterials" name="newMaterials" multiple class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelEditLessonBtn" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">Отмена</button>
+                    <button type="submit" class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition">Сохранить изменения</button>
+                </div>
+                <p id="editLessonFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="notificationsDropdown" class="hidden fixed right-4 top-16 w-80 bg-white rounded-lg shadow-lg z-[1060] border border-gray-200">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="font-semibold">Уведомления</h3>
+            <button id="clearNotificationsBtn" class="text-sm text-primary-500 hover:text-primary-600">Очистить все</button>
+        </div>
+        <div id="notificationsListContainer" class="max-h-96 overflow-y-auto">
+            <p class="p-4 text-sm text-gray-500">Загрузка уведомлений...</p>
+        </div>
+        <div class="p-3 border-t border-gray-200 text-center">
+            <a href="notifications.html" class="text-sm text-primary-500 font-medium hover:text-primary-600">Показать все уведомления</a>
+        </div>
+    </div>
+
+    <div id="userMenuDropdown" class="hidden fixed right-4 top-16 w-56 bg-white rounded-lg shadow-lg z-[1060] border border-gray-200">
+        <div class="p-2">
+            <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Мой профиль</a>
+            <a href="settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Настройки</a>
+            <div class="border-t border-gray-200 my-1"></div>
+            <a href="#" id="logoutBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded transition-colors">Выйти</a>
+        </div>
+    </div>
+
+    <script src="js/lesson.js"></script>
+</body>
+</html>
+
+фронт lesson.js:
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Элементы ---
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const notificationsBtn = document.getElementById('notificationsBtn');
+    const notificationsDropdown = document.getElementById('notificationsDropdown');
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userMenuDropdown = document.getElementById('userMenuDropdown');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const notificationPopupContainer = document.getElementById('notificationPopupContainer');
+    const notificationCountBadge = document.getElementById('notificationCountBadge');
+    const clearNotificationsBtn = document.getElementById('clearNotificationsBtn');
+    const notificationsListContainer = document.getElementById('notificationsListContainer');
+
+    // Элементы страницы урока
+    const backToCourseLink = document.getElementById('backToCourseLink');
+    const courseTitleHeader = document.getElementById('courseTitleHeader');
+    const adminControls = document.getElementById('adminControls');
+    const editLessonBtn = document.getElementById('editLessonBtn');
+    const lessonTitleDisplay = document.getElementById('lessonTitleDisplay');
+    const lessonDateDisplay = document.getElementById('lessonDateDisplay');
+    const lessonVideoEmbed = document.getElementById('lessonVideoEmbed');
+    const lessonVideoContainer = document.getElementById('lessonVideoContainer');
+    const homeworkTaskSection = document.getElementById('homeworkTaskSection');
+    const homeworkTaskText = document.getElementById('homeworkTaskText');
+    const materialsCount = document.getElementById('materialsCount');
+    const materialsList = document.getElementById('materialsList');
+    const materialsLoadingMsg = document.getElementById('materialsLoadingMsg');
+    const homeworkSubmissionSection = document.getElementById('homeworkSubmissionSection');
+    const homeworkSubmissionForm = document.getElementById('homeworkSubmissionForm');
+    const homeworkFileInput = document.getElementById('homeworkFile');
+    const homeworkFileLabel = document.getElementById('homeworkFileLabel');
+    const homeworkFileNameDisplay = document.getElementById('homeworkFileNameDisplay');
+    const homeworkCommentInput = document.getElementById('homeworkComment');
+    const submitHomeworkBtn = document.getElementById('submitHomeworkBtn');
+    const homeworkFormError = document.getElementById('homeworkFormError');
+    const addCommentBtn = document.getElementById('addCommentBtn');
+    const addCommentFormContainer = document.getElementById('addCommentFormContainer');
+    const addCommentForm = document.getElementById('addCommentForm');
+    const commentTextInput = document.getElementById('commentText');
+    const cancelCommentBtn = document.getElementById('cancelCommentBtn');
+    const commentFormError = document.getElementById('commentFormError');
+    const commentsList = document.getElementById('commentsList');
+    const commentsLoadingMsg = document.getElementById('commentsLoadingMsg');
+
+    // Элементы модального окна редактирования
+    const editLessonModal = document.getElementById('editLessonModal');
+    const closeEditLessonModalBtn = document.getElementById('closeEditLessonModalBtn');
+    const cancelEditLessonBtn = document.getElementById('cancelEditLessonBtn');
+    const editLessonForm = document.getElementById('editLessonForm');
+    const editLessonTitleInput = document.getElementById('editLessonTitle');
+    const editLessonVideoUrlInput = document.getElementById('editLessonVideoUrl');
+    const currentMaterialsEditList = document.getElementById('currentMaterialsEditList');
+    const editNewLessonMaterialsInput = document.getElementById('editNewLessonMaterials');
+    const editLessonFormError = document.getElementById('editLessonFormError');
+    let deletedMaterialIds = [];
+
+    // --- Состояние ---
+    let currentUser = null;
+    let userNotifications = [];
+    const API_BASE_URL = 'http://localhost:3000/api';
+    const urlParams = new URLSearchParams(window.location.search);
+    const lessonId = urlParams.get('lessonId');
+
+    // --- Вспомогательные функции ---
+    function getFileTypeVisuals(fileTypeOrName) {
+        const extension = typeof fileTypeOrName === 'string' ? fileTypeOrName.split('.').pop().toLowerCase() : 'default';
+        const map = {
+            'pdf': { icon: 'fa-file-pdf', color: 'red' },
+            'doc': { icon: 'fa-file-word', color: 'blue' }, 'docx': { icon: 'fa-file-word', color: 'blue' },
+            'ppt': { icon: 'fa-file-powerpoint', color: 'orange' }, 'pptx': { icon: 'fa-file-powerpoint', color: 'orange' },
+            'xls': { icon: 'fa-file-excel', color: 'green' }, 'xlsx': { icon: 'fa-file-excel', color: 'green' },
+            'jpg': { icon: 'fa-file-image', color: 'purple' }, 'jpeg': { icon: 'fa-file-image', color: 'purple' },
+            'png': { icon: 'fa-file-image', color: 'purple' }, 'gif': { icon: 'fa-file-image', color: 'purple' },
+            'zip': { icon: 'fa-file-archive', color: 'gray' }, 'rar': { icon: 'fa-file-archive', color: 'gray' },
+            'txt': { icon: 'fa-file-alt', color: 'gray' }
+        };
+        return map[extension] || { icon: 'fa-file', color: 'gray' };
+    }
+
+    function showNotificationPopup(message, type = 'info') {
+        if (!notificationPopupContainer) return;
+        const popupId = `notif-${Date.now()}`;
+        const popup = document.createElement('div');
+        let bgColor = 'bg-primary-100'; let textColor = 'text-primary-800'; let iconClass = 'fas fa-info-circle';
+        if (type === 'success') { bgColor = 'bg-green-100'; textColor = 'text-green-800'; iconClass = 'fas fa-check-circle'; }
+        else if (type === 'error') { bgColor = 'bg-red-100'; textColor = 'text-red-800'; iconClass = 'fas fa-exclamation-circle'; }
+
+        popup.id = popupId;
+        popup.className = `${bgColor} ${textColor} p-3 shadow-md flex justify-between items-center mb-2 rounded-md pointer-events-auto`;
+        popup.innerHTML = `
+            <div class="flex items-center"><i class="${iconClass} mr-2"></i><span>${message}</span></div>
+            <button data-dismiss="${popupId}" class="text-sm font-medium hover:opacity-75"><i class="fas fa-times"></i></button>
+        `;
+        notificationPopupContainer.appendChild(popup);
+        const closeBtn = popup.querySelector(`button[data-dismiss="${popupId}"]`);
+        const autoCloseTimeout = setTimeout(() => { if (popup) popup.remove(); }, 5000);
+        if (closeBtn) closeBtn.onclick = () => { clearTimeout(autoCloseTimeout); if (popup) popup.remove(); };
+    }
+
+    function showError(element, message) { if (element) { element.textContent = message; element.classList.remove('hidden'); } }
+    function hideError(element) { if (element) { element.textContent = ''; element.classList.add('hidden'); } }
+
+    // --- Общая логика UI (меню, модальные окна) ---
+    if (menuToggle && sidebar && overlay) {
+        menuToggle.addEventListener('click', () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+    }
+    function toggleDropdown(btn, dropdown, otherDropdowns = []) {
+        if (btn && dropdown) {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = dropdown.classList.contains('hidden');
+                document.querySelectorAll('.fixed.z-\\[1060\\]').forEach(d => d.classList.add('hidden'));
+                if (isHidden) dropdown.classList.remove('hidden');
+                otherDropdowns.forEach(d => d.classList.add('hidden'));
+            });
+        }
+    }
+    toggleDropdown(notificationsBtn, notificationsDropdown, [userMenuDropdown]);
+    toggleDropdown(userMenuBtn, userMenuDropdown, [notificationsDropdown]);
+    document.addEventListener('click', (e) => {
+        if (notificationsDropdown && !notificationsDropdown.contains(e.target) && e.target !== notificationsBtn) notificationsDropdown.classList.add('hidden');
+        if (userMenuDropdown && !userMenuDropdown.contains(e.target) && e.target !== userMenuBtn) userMenuDropdown.classList.add('hidden');
+    });
+    function openModal(modalElement) { if (modalElement) { modalElement.classList.add('active'); document.body.style.overflow = 'hidden'; } }
+    function closeModal(modalElement) { if (modalElement) { modalElement.classList.remove('active'); document.body.style.overflow = ''; } }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (notificationsDropdown) notificationsDropdown.classList.add('hidden');
+            if (userMenuDropdown) userMenuDropdown.classList.add('hidden');
+            if (editLessonModal && editLessonModal.classList.contains('active')) closeModal(editLessonModal);
+            if (addCommentFormContainer && !addCommentFormContainer.classList.contains('hidden')) {
+                addCommentFormContainer.classList.add('hidden');
+                if (addCommentBtn) addCommentBtn.classList.remove('hidden');
+            }
+        }
+    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault(); localStorage.removeItem('currentUser');
+            showNotificationPopup('Выход из системы...', 'info');
+            setTimeout(() => { window.location.href = 'auth.html'; }, 1000);
+        });
+    }
+    function renderNotifications() { /* Заглушка для уведомлений */ }
+    async function loadNotifications() { userNotifications = []; renderNotifications(); }
+    if (clearNotificationsBtn) clearNotificationsBtn.addEventListener('click', () => { /* Заглушка */ });
+
+    // --- Инициализация данных пользователя ---
+    function updateUserDataUI(userData) {
+        if (!userData) { localStorage.removeItem('currentUser'); window.location.href = 'auth.html'; return; }
+        currentUser = userData;
+        const defaultAvatar = 'assets/images/default-avatar.png';
+        ['sidebarUserAvatar', 'headerUserAvatar'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.src = userData.avatarUrl || defaultAvatar;
+        });
+        ['sidebarUserName', 'headerUserName'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = userData.fullname || 'Пользователь';
+        });
+        const roleEl = document.getElementById('sidebarUserRole');
+        if (roleEl) roleEl.textContent = userData.role || 'Статус';
+    }
+    function initializeUserData() {
+        const cachedUser = localStorage.getItem('currentUser');
+        if (!cachedUser) { window.location.href = 'auth.html'; return; }
+        try { updateUserDataUI(JSON.parse(cachedUser)); }
+        catch (e) { localStorage.removeItem('currentUser'); window.location.href = 'auth.html'; }
+    }
+
+    // --- Загрузка данных урока ---
+    async function loadLessonDetails() {
+        if (!lessonId || !currentUser) {
+            showNotificationPopup('Ошибка: ID урока или данные пользователя отсутствуют.', 'error');
+            if (lessonTitleDisplay) lessonTitleDisplay.textContent = "Ошибка загрузки урока";
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE_URL}/lesson?lessonId=${encodeURIComponent(lessonId)}&email=${encodeURIComponent(currentUser.email)}`);
+            if (!response.ok) { const errData = await response.json(); throw new Error(errData.message || `Ошибка ${response.status}`); }
+            const data = await response.json();
+            const lesson = data.lesson;
+
+            document.title = `${lesson.title || 'Урок'} | EduPlatform`;
+            if (courseTitleHeader) courseTitleHeader.textContent = lesson.courseTitle || 'Курс';
+            if (backToCourseLink && lesson.courseId) backToCourseLink.href = `course-detail.html?courseId=${lesson.courseId}`;
+            if (lessonTitleDisplay) lessonTitleDisplay.textContent = lesson.title;
+            if (lessonDateDisplay) lessonDateDisplay.textContent = lesson.date ? `Дата: ${new Date(lesson.date).toLocaleDateString('ru-RU')}` : `ID Урока: ${lesson.lessonId}`;
+
+            if (lessonVideoContainer && lessonVideoEmbed) {
+                if (lesson.videoUrl) {
+                    lessonVideoEmbed.src = lesson.videoUrl;
+                    lessonVideoContainer.classList.remove('hidden');
+                } else {
+                    lessonVideoContainer.classList.add('hidden');
+                }
+            }
+            if (adminControls && lesson.isEditable && (currentUser.role === 'Teacher' || currentUser.role === 'Admin')) {
+                adminControls.classList.remove('hidden');
+            } else if (adminControls) {
+                adminControls.classList.add('hidden');
+            }
+
+            if (homeworkTaskSection && homeworkTaskText && homeworkSubmissionSection && submitHomeworkBtn) {
+                if (lesson.homework && lesson.homework.taskText) {
+                    homeworkTaskSection.classList.remove('hidden');
+                    homeworkTaskText.textContent = lesson.homework.taskText;
+                    homeworkSubmissionSection.classList.remove('hidden');
+                    if (lesson.homework.hasSubmission) {
+                        submitHomeworkBtn.disabled = true; submitHomeworkBtn.textContent = 'Задание отправлено';
+                        if (homeworkFileInput) homeworkFileInput.disabled = true;
+                        if (homeworkCommentInput) homeworkCommentInput.disabled = true;
+                        if (homeworkFileLabel) homeworkFileLabel.textContent = 'Файл уже загружен';
+                    } else {
+                        submitHomeworkBtn.disabled = false; submitHomeworkBtn.textContent = 'Отправить задание';
+                        if (homeworkFileInput) homeworkFileInput.disabled = false;
+                        if (homeworkCommentInput) homeworkCommentInput.disabled = false;
+                        if (homeworkFileLabel) homeworkFileLabel.textContent = 'Загрузить файл';
+                    }
+                } else {
+                    homeworkTaskSection.classList.add('hidden');
+                    homeworkSubmissionSection.classList.add('hidden');
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки данных урока:', error);
+            showNotificationPopup(`Ошибка загрузки урока: ${error.message}`, 'error');
+            if (lessonTitleDisplay) lessonTitleDisplay.textContent = "Не удалось загрузить урок";
+        }
+    }
+
+    // --- Загрузка и отображение материалов ---
+    async function loadMaterials() {
+        if (!lessonId || !materialsLoadingMsg || !materialsList || !materialsCount) return;
+        materialsLoadingMsg.classList.remove('hidden');
+        materialsList.innerHTML = '';
+        try {
+            const response = await fetch(`${API_BASE_URL}/lesson/materials?lessonId=${encodeURIComponent(lessonId)}`);
+            if (!response.ok) throw new Error('Ошибка загрузки материалов');
+            const data = await response.json();
+
+            materialsLoadingMsg.classList.add('hidden');
+            materialsCount.textContent = `${data.materials.length} файлов`;
+
+            if (data.materials.length === 0) {
+                materialsList.innerHTML = '<p class="text-gray-500 col-span-full">Материалы к этому уроку отсутствуют.</p>';
+                return;
+            }
+            data.materials.forEach(material => {
+                const visuals = getFileTypeVisuals(material.fileName);
+                const materialEl = document.createElement('div');
+                materialEl.className = 'file-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative group';
+                const downloadUrl = `${API_BASE_URL}/lesson/materials/download/${material.materialId}`;
+
+                materialEl.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="bg-${visuals.color}-100 p-3 rounded-lg mr-3"> <i class="fas ${visuals.icon} text-${visuals.color}-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 truncate w-40 md:w-full" title="${material.fileName}">${material.fileName}</h4>
+                            <p class="text-sm text-gray-500">${material.fileType.toUpperCase()} • ${(material.fileSize / (1024*1024)).toFixed(2)} MB</p>
+                        </div>
+                    </div>
+                    <div class="file-actions absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                        <a href="${downloadUrl}" target="_blank" class="text-primary-500 hover:text-primary-700 p-1" title="Скачать">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        ${(currentUser && (currentUser.role === 'Teacher' || currentUser.role === 'Admin')) ? `
+                        <button data-material-id="${material.materialId}" class="delete-material-btn text-red-500 hover:text-red-700 p-1" title="Удалить">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                materialsList.appendChild(materialEl);
+            });
+            document.querySelectorAll('.delete-material-btn').forEach(button => button.addEventListener('click', handleDeleteMaterial));
+        } catch (error) {
+            console.error('Ошибка загрузки материалов:', error);
+            materialsLoadingMsg.classList.add('hidden');
+            materialsList.innerHTML = '<p class="text-red-500 col-span-full">Не удалось загрузить материалы.</p>';
+            materialsCount.textContent = `Ошибка`;
+        }
+    }
+    async function handleDeleteMaterial(event) {
+        const materialId = event.currentTarget.dataset.materialId;
+        if (!confirm('Вы уверены, что хотите удалить этот материал?')) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/lesson/materials/${materialId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: currentUser.email })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Ошибка удаления');
+            showNotificationPopup('Материал удалён!', 'success');
+            loadMaterials();
+        } catch (error) { showNotificationPopup(`Ошибка удаления: ${error.message}`, 'error'); }
+    }
+
+    // --- Отправка домашнего задания ---
+    if (homeworkSubmissionForm && homeworkFileInput && homeworkFileNameDisplay && submitHomeworkBtn && homeworkFormError) {
+        homeworkFileInput.addEventListener('change', () => {
+            homeworkFileNameDisplay.textContent = homeworkFileInput.files.length > 0 ? `Выбран файл: ${homeworkFileInput.files[0].name}` : '';
+        });
+        homeworkSubmissionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!homeworkFileInput.files[0]) { showError(homeworkFormError, 'Пожалуйста, выберите файл.'); return; }
+            hideError(homeworkFormError);
+            submitHomeworkBtn.disabled = true; submitHomeworkBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Отправка...`;
+
+            const formData = new FormData();
+            formData.append('lessonId', lessonId);
+            formData.append('email', currentUser.email);
+            formData.append('homeworkFile', homeworkFileInput.files[0]);
+            formData.append('homeworkComment', homeworkCommentInput.value.trim());
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lesson/homework`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || `Ошибка ${response.status}`);
+                showNotificationPopup('Домашнее задание успешно отправлено!', 'success');
+                homeworkSubmissionForm.reset(); homeworkFileNameDisplay.textContent = '';
+                submitHomeworkBtn.textContent = 'Задание отправлено'; homeworkFileInput.disabled = true;
+                if (homeworkCommentInput) homeworkCommentInput.disabled = true;
+                loadComments(); loadLessonDetails();
+            } catch (error) {
+                showError(homeworkFormError, `Ошибка: ${error.message}`);
+                submitHomeworkBtn.disabled = false; submitHomeworkBtn.textContent = 'Отправить задание';
+            }
+        });
+    }
+
+    // --- Комментарии ---
+    if (addCommentBtn && addCommentFormContainer && commentTextInput && cancelCommentBtn && addCommentForm && commentFormError && commentsList && commentsLoadingMsg) {
+        addCommentBtn.addEventListener('click', () => {
+            addCommentFormContainer.classList.remove('hidden'); addCommentBtn.classList.add('hidden'); commentTextInput.focus();
+        });
+        cancelCommentBtn.addEventListener('click', () => {
+            addCommentFormContainer.classList.add('hidden'); addCommentBtn.classList.remove('hidden'); commentTextInput.value = ''; hideError(commentFormError);
+        });
+        addCommentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = commentTextInput.value.trim();
+            if (!text) { showError(commentFormError, 'Комментарий не может быть пустым.'); return; }
+            hideError(commentFormError);
+            const submitButton = addCommentForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true; submitButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Отправка...`;
+            try {
+                const response = await fetch(`${API_BASE_URL}/lesson/comments`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ lessonId, commentText: text, email: currentUser.email })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Ошибка отправки');
+                showNotificationPopup('Комментарий добавлен!', 'success');
+                commentTextInput.value = ''; addCommentFormContainer.classList.add('hidden'); addCommentBtn.classList.remove('hidden');
+                loadComments();
+            } catch (error) { showError(commentFormError, `Ошибка: ${error.message}`); }
+            finally { submitButton.disabled = false; submitButton.textContent = 'Отправить'; }
+        });
+    }
+
+    async function loadComments() {
+        if (!lessonId || !currentUser || !commentsLoadingMsg || !commentsList) return;
+        commentsLoadingMsg.classList.remove('hidden'); commentsList.innerHTML = '';
+        try {
+            const response = await fetch(`${API_BASE_URL}/lesson/comments?lessonId=${encodeURIComponent(lessonId)}&email=${encodeURIComponent(currentUser.email)}`);
+            if (!response.ok) throw new Error('Ошибка загрузки комментариев');
+            const data = await response.json();
+            console.log('Полученные комментарии:', data.comments); // Для отладки
+            commentsLoadingMsg.classList.add('hidden');
+            if (data.comments.length === 0) {
+                commentsList.innerHTML = '<p class="text-gray-500">Пока нет комментариев к этому уроку.</p>'; return;
+            }
+            data.comments.forEach(comment => {
+                const commentEl = document.createElement('div');
+                let bgColorClass = 'bg-white';
+                if (comment.isTeacherComment) bgColorClass = 'bg-primary-50';
+                else if (comment.isHomeworkSubmission) bgColorClass = 'bg-green-50';
+                commentEl.className = `p-4 border border-gray-200 rounded-lg ${bgColorClass}`;
+
+                const defaultAvatar = 'assets/images/default-avatar.png';
+                const avatarUrl = comment.avatarUrl || defaultAvatar;
+                const visuals = comment.isHomeworkSubmission && comment.submissionFileName ? getFileTypeVisuals(comment.submissionFileName) : null;
+
+                const homeworkDownloadUrl = comment.isHomeworkSubmission && comment.submissionFilePath
+                    ? `${API_BASE_URL}/lesson/homeworks/download?filepath=${encodeURIComponent(comment.submissionFilePath)}&email=${encodeURIComponent(currentUser.email)}`
+                    : '#';
+
+                const createdAtDate = new Date(comment.createdAt);
+                const formattedDate = isNaN(createdAtDate.getTime())
+                    ? 'Дата неизвестна'
+                    : createdAtDate.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+                commentEl.innerHTML = `
+                    <div class="flex items-start">
+                        <img src="${avatarUrl}" alt="${comment.fullName || 'Пользователь'}" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center flex-wrap">
+                                    <p class="font-semibold text-gray-800 mr-2">${comment.fullName || 'Пользователь'}</p>
+                                    ${comment.isTeacherComment ? '<span class="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full mr-1 mb-1">Преподаватель</span>' : ''}
+                                    ${comment.isHomeworkSubmission ? '<span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full mr-1 mb-1">Домашнее задание</span>' : ''}
+                                </div>
+                                <span class="text-xs text-gray-500 whitespace-nowrap">${formattedDate}</span>
+                            </div>
+                            <p class="text-gray-700 mt-1 whitespace-pre-wrap">${comment.commentText || ''}</p>
+                            ${comment.isHomeworkSubmission && comment.submissionFileName && visuals ? `
+                                <div class="mt-2 p-2 border border-gray-200 rounded-md bg-gray-50 flex items-center space-x-2">
+                                    <i class="fas ${visuals.icon} text-${visuals.color}-500"></i>
+                                    <a href="${homeworkDownloadUrl}" target="_blank" class="text-sm text-primary-600 hover:underline" title="Скачать ${comment.submissionFileName}">
+                                        ${comment.submissionFileName}
+                                    </a>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                commentsList.appendChild(commentEl);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки комментариев:', error);
+            commentsLoadingMsg.classList.add('hidden');
+            commentsList.innerHTML = '<p class="text-red-500">Не удалось загрузить комментарии.</p>';
+        }
+    }
+
+    // --- Редактирование урока (модальное окно) ---
+    if (editLessonBtn && editLessonModal && closeEditLessonModalBtn && cancelEditLessonBtn && editLessonForm && editLessonTitleInput && editLessonVideoUrlInput && currentMaterialsEditList && editNewLessonMaterialsInput && editLessonFormError) {
+        editLessonBtn.addEventListener('click', () => {
+            if (!currentUser || !['Teacher', 'Admin'].includes(currentUser.role)) return;
+            populateEditModal(); openModal(editLessonModal);
+        });
+        closeEditLessonModalBtn.addEventListener('click', () => closeModal(editLessonModal));
+        cancelEditLessonBtn.addEventListener('click', () => closeModal(editLessonModal));
+        editLessonModal.addEventListener('click', (e) => { if (e.target === editLessonModal) closeModal(editLessonModal); });
+
+        async function populateEditModal() {
+            editLessonTitleInput.value = lessonTitleDisplay.textContent;
+            editLessonVideoUrlInput.value = lessonVideoEmbed.src;
+            currentMaterialsEditList.innerHTML = ''; deletedMaterialIds = [];
+            editLessonForm.reset();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lesson/materials?lessonId=${encodeURIComponent(lessonId)}`);
+                if (!response.ok) throw new Error('Ошибка загрузки материалов для редактирования');
+                const data = await response.json();
+                if (data.materials.length > 0) {
+                    data.materials.forEach(material => {
+                        const visuals = getFileTypeVisuals(material.fileName);
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center justify-between p-2 bg-gray-100 rounded-md text-sm';
+                        item.innerHTML = `
+                            <div class="flex items-center overflow-hidden">
+                                <i class="fas ${visuals.icon} text-${visuals.color}-500 mr-2"></i>
+                                <span class="truncate" title="${material.fileName}">${material.fileName}</span>
+                            </div>
+                            <button type="button" data-material-id="${material.materialId}" class="ml-2 text-red-500 hover:text-red-700 text-xs remove-material-edit-btn flex-shrink-0">
+                                <i class="fas fa-times mr-1"></i>Удалить
+                            </button>
+                        `;
+                        currentMaterialsEditList.appendChild(item);
+                    });
+                    document.querySelectorAll('.remove-material-edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const matId = e.currentTarget.dataset.materialId;
+                            if (!deletedMaterialIds.includes(matId)) deletedMaterialIds.push(matId);
+                            e.currentTarget.parentElement.classList.add('line-through', 'opacity-50');
+                            e.currentTarget.disabled = true;
+                        });
+                    });
+                } else {
+                    currentMaterialsEditList.innerHTML = '<p class="text-sm text-gray-500">Нет прикрепленных материалов.</p>';
+                }
+            } catch (e) { currentMaterialsEditList.innerHTML = '<p class="text-sm text-red-500">Не удалось загрузить список материалов.</p>'; }
+        }
+
+        editLessonForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); hideError(editLessonFormError);
+            const submitButton = editLessonForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true; submitButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Сохранение...`;
+
+            const formData = new FormData();
+            formData.append('lessonId', lessonId); formData.append('email', currentUser.email);
+            formData.append('title', editLessonTitleInput.value.trim());
+            formData.append('videoUrl', editLessonVideoUrlInput.value.trim());
+            formData.append('deletedMaterialIdsJson', JSON.stringify(deletedMaterialIds));
+            Array.from(editNewLessonMaterialsInput.files).forEach(file => formData.append('newMaterials', file));
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lesson`, { method: 'PUT', body: formData });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || `Ошибка ${response.status}`);
+                showNotificationPopup('Урок успешно обновлён!', 'success');
+                closeModal(editLessonModal);
+                await loadLessonDetails(); await loadMaterials();
+            } catch (error) { showError(editLessonFormError, `Ошибка: ${error.message}`); }
+            finally { submitButton.disabled = false; submitButton.textContent = 'Сохранить изменения'; }
+        });
+    }
+
+    // --- Инициализация страницы ---
+    async function initializePage() {
+        initializeUserData();
+        if (!lessonId) {
+            showNotificationPopup('ID урока не указан в URL.', 'error');
+            document.body.innerHTML = '<div class="flex justify-center items-center h-screen"><p class="text-center text-red-500 p-10 text-xl">Ошибка: ID урока не найден. Вернитесь назад и попробуйте снова.</p></div>';
+            return;
+        }
+        if (currentUser) {
+            await loadLessonDetails();
+            await loadMaterials();
+            await loadComments();
+            await loadNotifications();
+        }
+    }
+
+    initializePage();
+});
+
+бэк lesson.js:
+const express = require('express');
+const router = express.Router();
+const pool = require('../config/db');
+const path = require('path');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+
+// Настройка путей к папкам для загрузок относительно корня проекта
+const projectRoot = path.join(__dirname, '..', '..'); // Корень проекта (выход из backend/routes/)
+const uploadsDir = path.join(projectRoot, 'uploads');
+const materialsDir = path.join(uploadsDir, 'materials');
+const homeworksDir = path.join(uploadsDir, 'homeworks');
+
+// Убедимся, что папки для загрузки существуют
+fs.mkdirSync(materialsDir, { recursive: true });
+fs.mkdirSync(homeworksDir, { recursive: true });
+
+// Multer storage для материалов урока
+const materialsStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, materialsDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, uuidv4() + path.extname(file.originalname));
+    }
+});
+const uploadMaterials = multer({ storage: materialsStorage });
+
+// Multer storage для домашних заданий
+const homeworkStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, homeworksDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, uuidv4() + path.extname(file.originalname));
+    }
+});
+const uploadHomework = multer({
+    storage: homeworkStorage,
+    limits: { fileSize: 25 * 1024 * 1024 } // Ограничение размера файла 25 МБ
+});
+
+// Вспомогательная функция для получения пользователя и его роли
+async function getUserAndRole(email) {
+    if (!email) return null;
+    const userResult = await pool.query('SELECT UserID, FullName, Role FROM Users WHERE Email = $1', [email]);
+    if (userResult.rows.length === 0) return null;
+    return userResult.rows[0]; // userid, fullname, role
+}
+
+// GET Детали урока (включая ДЗ и статус сдачи)
+router.get('/', async (req, res) => {
+    const { lessonId, email } = req.query;
+    if (!lessonId || !email) {
+        return res.status(400).json({ message: 'LessonId или email не предоставлены' });
+    }
+
+    try {
+        const user = await getUserAndRole(email);
+        if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
+
+        const lessonQuery = `
+            SELECT 
+                l.LessonID, l.Title, l.Content, l.Date, l.CourseID, 
+                c.Title AS CourseTitle,
+                h.HomeworkID, h.TaskText,
+                EXISTS (
+                    SELECT 1 FROM HomeworkSubmissions hs 
+                    WHERE hs.HomeworkID = h.HomeworkID AND hs.UserID = $2
+                ) AS has_submission
+            FROM Lessons l
+            JOIN Courses c ON l.CourseID = c.CourseID
+            LEFT JOIN Homeworks h ON l.LessonID = h.LessonID
+            WHERE l.LessonID = $1;
+        `;
+        const lessonResult = await pool.query(lessonQuery, [lessonId, user.userid]);
+
+        if (lessonResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Урок не найден' });
+        }
+
+        const lessonData = lessonResult.rows[0];
+        res.json({
+            lesson: {
+                lessonId: lessonData.lessonid,
+                title: lessonData.title,
+                videoUrl: lessonData.content,
+                date: lessonData.date,
+                courseId: lessonData.courseid,
+                courseTitle: lessonData.coursetitle,
+                homework: lessonData.homeworkid ? {
+                    homeworkId: lessonData.homeworkid,
+                    taskText: lessonData.tasktext,
+                    hasSubmission: lessonData.has_submission
+                } : null,
+                isEditable: ['Teacher', 'Admin'].includes(user.role)
+            }
+        });
+    } catch (error) {
+        console.error('Ошибка получения данных урока:', error);
+        res.status(500).json({ message: 'Ошибка сервера при получении данных урока' });
+    }
+});
+
+// GET Материалы урока
+router.get('/materials', async (req, res) => {
+    const { lessonId } = req.query;
+    if (!lessonId) return res.status(400).json({ message: 'LessonId не предоставлен' });
+
+    try {
+        const materialsResult = await pool.query(
+            'SELECT MaterialID, FileName, FileType, FileSize, FilePath FROM LessonMaterials WHERE LessonID = $1 ORDER BY UploadedAt DESC',
+            [lessonId]
+        );
+        res.json({
+            materials: materialsResult.rows.map(m => ({
+                materialId: m.materialid,
+                fileName: m.filename,
+                fileType: m.filetype,
+                fileSize: m.filesize,
+                filePath: m.filepath.replace(/\\/g, '/')
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка получения материалов:', error);
+        res.status(500).json({ message: 'Ошибка сервера при получении материалов' });
+    }
+});
+
+// DOWNLOAD Материал урока
+router.get('/materials/download/:materialId', async (req, res) => {
+    const { materialId } = req.params;
+    try {
+        const materialResult = await pool.query(
+            'SELECT FilePath, FileName FROM LessonMaterials WHERE MaterialID = $1',
+            [materialId]
+        );
+        if (materialResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Материал не найден' });
+        }
+        const { filepath, filename } = materialResult.rows[0];
+        const absoluteFilePath = path.join(projectRoot, filepath);
+
+        if (fs.existsSync(absoluteFilePath)) {
+            res.download(absoluteFilePath, filename);
+        } else {
+            console.error(`Файл не найден на сервере: ${absoluteFilePath} (запрошен по ID: ${materialId})`);
+            res.status(404).json({ message: 'Файл не найден на сервере' });
+        }
+    } catch (error) {
+        console.error('Ошибка скачивания материала:', error);
+        res.status(500).json({ message: 'Ошибка сервера при скачивании материала' });
+    }
+});
+
+// DELETE Материал урока (только Учитель/Админ)
+router.delete('/materials/:materialId', async (req, res) => {
+    const { materialId } = req.params;
+    const { email } = req.body;
+
+    try {
+        const user = await getUserAndRole(email);
+        if (!user || !['Teacher', 'Admin'].includes(user.role)) {
+            return res.status(403).json({ message: 'Доступ запрещён' });
+        }
+
+        const materialResult = await pool.query(
+            'SELECT FilePath FROM LessonMaterials WHERE MaterialID = $1',
+            [materialId]
+        );
+        if (materialResult.rows.length === 0) {
+            return res.status(404).json({ message: 'Материал не найден для удаления' });
+        }
+
+        const { filepath } = materialResult.rows[0];
+        const absoluteFilePath = path.join(projectRoot, filepath);
+
+        await pool.query('DELETE FROM LessonMaterials WHERE MaterialID = $1', [materialId]);
+
+        if (fs.existsSync(absoluteFilePath)) {
+            fs.unlinkSync(absoluteFilePath);
+        }
+
+        res.json({ message: 'Материал успешно удалён' });
+    } catch (error) {
+        console.error('Ошибка удаления материала:', error);
+        res.status(500).json({ message: 'Ошибка сервера при удалении материала' });
+    }
+});
+
+// GET Комментарии к уроку
+router.get('/comments', async (req, res) => {
+    const { lessonId, email } = req.query;
+    if (!lessonId || !email) {
+        return res.status(400).json({ message: 'LessonId или email не предоставлены' });
+    }
+    try {
+        const user = await getUserAndRole(email);
+        if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
+
+        let commentsQuery = `
+            SELECT lc.CommentID, lc.UserID, u.FullName, u.Role AS UserRole, lc.CommentText, lc.CreatedAt,
+                   lc.IsTeacherComment, lc.IsHomeworkSubmission, lc.SubmissionFileName, lc.SubmissionFilePath
+            FROM LessonComments lc
+            JOIN Users u ON lc.UserID = u.UserID
+            WHERE lc.LessonID = $1
+        `;
+        const queryParams = [lessonId];
+
+        if (!['Teacher', 'Admin'].includes(user.role)) {
+            commentsQuery += ` AND (
+                (lc.IsHomeworkSubmission = FALSE AND lc.UserID = $2) OR 
+                (lc.IsHomeworkSubmission = TRUE AND lc.UserID = $2) OR
+                (lc.IsHomeworkSubmission = FALSE AND lc.IsTeacherComment = TRUE)
+            ) `;
+            queryParams.push(user.userid);
+        }
+        commentsQuery += ' ORDER BY lc.CreatedAt ASC';
+
+        const commentsResult = await pool.query(commentsQuery, queryParams);
+        res.json({
+            comments: commentsResult.rows.map(c => ({
+                commentId: c.commentid,
+                userId: c.userid,
+                fullName: c.fullname,
+                role: c.userrole,
+                commentText: c.commenttext,
+                createdAt: c.createdat,
+                isTeacherComment: c.isteachercomment,
+                isHomeworkSubmission: c.ishomeworksubmission,
+                submissionFileName: c.submissionfilename,
+                submissionFilePath: c.submissionfilepath ? c.submissionfilepath.replace(/\\/g, '/') : null,
+                avatarUrl: null // Заглушка для аватара, замените на реальную логику, если есть
+            }))
+        });
+    } catch (error) {
+        console.error('Ошибка получения комментариев:', error);
+        res.status(500).json({ message: 'Ошибка сервера при получении комментариев' });
+    }
+});
+
+// POST Новый комментарий
+router.post('/comments', async (req, res) => {
+    const { lessonId, commentText, email } = req.body;
+    if (!lessonId || !commentText || !email) {
+        return res.status(400).json({ message: 'Не все данные для комментария предоставлены' });
+    }
+    try {
+        const user = await getUserAndRole(email);
+        if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
+
+        const isTeacherComment = ['Teacher', 'Admin'].includes(user.role);
+
+        const insertResult = await pool.query(
+            `INSERT INTO LessonComments (LessonID, UserID, CommentText, IsTeacherComment, IsHomeworkSubmission)
+             VALUES ($1, $2, $3, $4, FALSE) RETURNING CommentID, CreatedAt`,
+            [lessonId, user.userid, commentText, isTeacherComment]
+        );
+        res.status(201).json({
+            message: 'Комментарий добавлен',
+            comment: {
+                commentId: insertResult.rows[0].commentid,
+                userId: user.userid,
+                fullName: user.fullname,
+                role: user.role,
+                commentText: commentText,
+                createdAt: insertResult.rows[0].createdat,
+                isTeacherComment: isTeacherComment,
+                isHomeworkSubmission: false,
+                submissionFileName: null,
+                submissionFilePath: null,
+                avatarUrl: null
+            }
+        });
+    } catch (error) {
+        console.error('Ошибка добавления комментария:', error);
+        res.status(500).json({ message: 'Ошибка сервера при добавлении комментария' });
+    }
+});
+
+// POST Сдача домашнего задания
+router.post('/homework', uploadHomework.single('homeworkFile'), async (req, res) => {
+    console.log('--- Запрос на /api/lesson/homework ---');
+    console.log('req.body:', req.body);
+    console.log('req.file:', req.file);
+    console.log('req.headers:', req.headers);
+
+    const { lessonId, homeworkComment, email } = req.body;
+    const file = req.file;
+
+    if (!lessonId || !email) {
+        if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        return res.status(400).json({ message: 'LessonId или email не предоставлены' });
+    }
+    if (!file) {
+        return res.status(400).json({ message: 'Файл домашнего задания не загружен' });
+    }
+
+    try {
+        const user = await getUserAndRole(email);
+        if (!user) {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+            return res.status(404).json({ message: 'Пользователь не найден' });
+        }
+
+        const homeworkMetaResult = await pool.query('SELECT HomeworkID FROM Homeworks WHERE LessonID = $1', [lessonId]);
+        if (homeworkMetaResult.rows.length === 0) {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+            return res.status(404).json({ message: 'Домашнее задание для этого урока не найдено' });
+        }
+        const homeworkId = homeworkMetaResult.rows[0].homeworkid;
+
+        const existingSubmission = await pool.query(
+            'SELECT SubmissionID FROM HomeworkSubmissions WHERE HomeworkID = $1 AND UserID = $2',
+            [homeworkId, user.userid]
+        );
+        if (existingSubmission.rows.length > 0) {
+            if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+            return res.status(409).json({ message: 'Вы уже отправили задание к этому уроку' });
+        }
+
+        const relativeFilePathInUploads = path.join('homeworks', file.filename);
+        const finalDbFilePath = path.join('uploads', relativeFilePathInUploads).replace(/\\/g, '/');
+
+        const submissionResult = await pool.query(
+            `INSERT INTO HomeworkSubmissions (HomeworkID, UserID, AnswerFilePath, SubmittedAt)
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING SubmissionID`,
+            [homeworkId, user.userid, finalDbFilePath]
+        );
+
+        const commentTextForHomework = homeworkComment || `Сдано домашнее задание: ${file.originalname}`;
+        await pool.query(
+            `INSERT INTO LessonComments (LessonID, UserID, CommentText, IsTeacherComment, IsHomeworkSubmission, SubmissionFilePath, SubmissionFileName)
+             VALUES ($1, $2, $3, FALSE, TRUE, $4, $5)`,
+            [lessonId, user.userid, commentTextForHomework, finalDbFilePath, file.originalname]
+        );
+
+        res.status(201).json({
+            message: 'Домашнее задание успешно отправлено',
+            submissionId: submissionResult.rows[0].submissionid,
+            fileName: file.originalname
+        });
+    } catch (error) {
+        console.error('Ошибка отправки домашнего задания:', error);
+        if (file && fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+        }
+        res.status(500).json({ message: 'Ошибка сервера при отправке ДЗ', details: error.message });
+    }
+});
+
+// PUT Редактирование урока (только Учитель/Админ)
+router.put('/', uploadMaterials.array('newMaterials', 10), async (req, res) => {
+    const { lessonId, title, videoUrl, email, deletedMaterialIdsJson } = req.body;
+    const newMaterialFiles = req.files;
+
+    if (!lessonId || !title || !email) {
+        if (newMaterialFiles) newMaterialFiles.forEach(f => { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); });
+        return res.status(400).json({ message: 'Не все данные для редактирования урока предоставлены' });
+    }
+
+    try {
+        const user = await getUserAndRole(email);
+        if (!user || !['Teacher', 'Admin'].includes(user.role)) {
+            if (newMaterialFiles) newMaterialFiles.forEach(f => { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); });
+            return res.status(403).json({ message: 'Доступ запрещён' });
+        }
+
+        await pool.query(
+            'UPDATE Lessons SET Title = $1, Content = $2 WHERE LessonID = $3',
+            [title, videoUrl || null, lessonId]
+        );
+
+        const deletedMaterialIds = deletedMaterialIdsJson ? JSON.parse(deletedMaterialIdsJson) : [];
+        if (deletedMaterialIds.length > 0) {
+            const materialsToDeleteResult = await pool.query(
+                'SELECT FilePath FROM LessonMaterials WHERE MaterialID = ANY($1::int[])',
+                [deletedMaterialIds]
+            );
+            for (const material of materialsToDeleteResult.rows) {
+                const absoluteFilePath = path.join(projectRoot, material.filepath);
+                if (fs.existsSync(absoluteFilePath)) {
+                    fs.unlinkSync(absoluteFilePath);
+                }
+            }
+            await pool.query('DELETE FROM LessonMaterials WHERE MaterialID = ANY($1::int[])', [deletedMaterialIds]);
+        }
+
+        if (newMaterialFiles && newMaterialFiles.length > 0) {
+            for (const file of newMaterialFiles) {
+                const relativeFilePathInUploads = path.join('materials', file.filename);
+                const finalDbFilePath = path.join('uploads', relativeFilePathInUploads).replace(/\\/g, '/');
+                await pool.query(
+                    `INSERT INTO LessonMaterials (LessonID, FilePath, FileName, FileType, FileSize, UploadedBy)
+                     VALUES ($1, $2, $3, $4, $5, $6)`,
+                    [lessonId, finalDbFilePath, file.originalname, path.extname(file.originalname).slice(1), file.size, user.userid]
+                );
+            }
+        }
+        res.json({ message: 'Урок успешно обновлён' });
+    } catch (error) {
+        console.error('Ошибка редактирования урока:', error);
+        if (newMaterialFiles) newMaterialFiles.forEach(f => { if (fs.existsSync(f.path)) fs.unlinkSync(f.path); });
+        res.status(500).json({ message: 'Ошибка сервера при редактировании урока' });
+    }
+});
+
+// DOWNLOAD Файл домашнего задания (защищенный)
+router.get('/homeworks/download', async (req, res) => {
+    const { filepath, email } = req.query;
+    if (!filepath || !email) {
+        return res.status(400).json({ message: 'Filepath или email не предоставлены' });
+    }
+    try {
+        const user = await getUserAndRole(email);
+        if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
+
+        if (!['Teacher', 'Admin'].includes(user.role)) {
+            const commentOwner = await pool.query(
+                `SELECT UserID FROM LessonComments WHERE SubmissionFilePath = $1 AND UserID = $2`,
+                [filepath, user.userid]
+            );
+            if (commentOwner.rows.length === 0) {
+                return res.status(403).json({ message: 'Доступ к этому файлу запрещён' });
+            }
+        }
+
+        const absoluteFilePath = path.join(projectRoot, filepath);
+        if (fs.existsSync(absoluteFilePath)) {
+            res.download(absoluteFilePath, path.basename(filepath));
+        } else {
+            console.error(`Файл ДЗ не найден: ${absoluteFilePath} (запрошен ${filepath})`);
+            res.status(404).json({ message: 'Файл домашнего задания не найден на сервере' });
+        }
+    } catch (error) {
+        console.error('Ошибка скачивания файла ДЗ:', error);
+        res.status(500).json({ message: 'Ошибка сервера при скачивании файла ДЗ' });
+    }
+});
+
+module.exports = router;

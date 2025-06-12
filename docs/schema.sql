@@ -1,6 +1,9 @@
 -- Создаём пользовательский тип для роли
 CREATE TYPE role_type AS ENUM ('Student', 'Teacher', 'Admin', 'Moderator', 'Parent');
 
+-- Добавляем перечисляемый тип для статусов ответов
+CREATE TYPE submission_status_type AS ENUM ('Требует проверки', 'Просмотрено', 'Принято', 'На доработку');
+
 -- Таблица Users
 CREATE TABLE Users (
   UserID SERIAL PRIMARY KEY,
@@ -108,5 +111,10 @@ CREATE TABLE LessonComments (
   IsTeacherComment BOOLEAN DEFAULT FALSE, -- Флаг для комментариев преподавателя
   IsHomeworkSubmission BOOLEAN DEFAULT FALSE, -- Флаг для комментариев с домашкой
   SubmissionFilePath VARCHAR(255), -- Путь к файлу, если это сдача ДЗ
-  SubmissionFileName VARCHAR(255) -- Имя файла, если это сдача ДЗ
+  SubmissionFileName VARCHAR(255), -- Имя файла, если это сдача ДЗ
+  status submission_status_type DEFAULT NULL,
+  attachment_file_path VARCHAR(255),
+  attachment_file_name VARCHAR(255),
+  ParentCommentID INTEGER REFERENCES LessonComments(CommentID) DEFAULT NULL
 );
+
